@@ -32,6 +32,7 @@ namespace TradingEngine::Data::LimitOrderBook {
         /* min and max repsective ask/bid prices */
         static int64_t minAsk;
         static int64_t maxBid;
+        static uint32_t symbolId;
 
         /* Memory areana to avoid time-heavy heap operations */
         static BookEntry entriesArena[MAX_NUM_ORDERS];
