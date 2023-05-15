@@ -5,6 +5,7 @@
 #include "order.h"
 #include "orderBook.h"
 
+// toggle debug
 #define DEBUG_MODE
 #ifdef DEBUG_MODE
 #define DEBUG
