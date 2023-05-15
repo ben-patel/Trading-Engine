@@ -6,12 +6,9 @@
 #include "orderBook.h"
 
 // toggle debug
-#define DEBUG_MODE
-#ifdef DEBUG_MODE
-#define DEBUG
-#endif
+//#define DEBUG_MODE
 
-#ifdef DEBUG
+#ifdef DEBUG_MODE
 void printOrder(TradingEngine::Order::Order o) {
     std::vector<std::string> orderTypes{ "LIMIT", "MARKET" };
     std::vector<std::string> orderSides{ "BUY", "SELL" };
@@ -32,7 +29,7 @@ void printOrder(TradingEngine::Order::Order o) {
     std::cout << "  QUANTITY: " << o.quantity << '\n';
 }
 
-void printEntry(TradingEngine::OrderBook::BookEntry entry, bool orderPrint) {
+void printEntry(TradingEngine::Data::LimitOrderBook::BookEntry entry, bool orderPrint) {
     std::cout << "ENTRY: {\n";
     if (entry.next == nullptr) {
         std::cout << "  NEXT ENTRY: NULL\n";
@@ -56,9 +53,9 @@ int main(void) {
         100 // size
     };
 
-    TradingEngine::OrderBook::BookEntry entry { order };
+    TradingEngine::Data::LimitOrderBook::BookEntry entry { order };
     
-    #ifdef DEBUG
+    #ifdef DEBUG_MODE
     printEntry(entry, true);
     #endif
     return 0;

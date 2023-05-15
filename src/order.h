@@ -28,6 +28,8 @@ namespace TradingEngine::Order {
         OrderLifetime lifetime;
 
         uint64_t id;
+        
+        /* id for stock symbol */
         uint64_t symbolId;
         uint64_t quantity;
         int64_t price;
