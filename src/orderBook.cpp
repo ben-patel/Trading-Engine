@@ -22,5 +22,7 @@ void operator delete (void *memory) {
 }
 
 namespace TradingEngine::Data::LimitOrderBook {
-    BookEntry::BookEntry(TradingEngine::Order::Order order): order{ order }, next { nullptr } {}
+    BookEntry::BookEntry(TradingEngine::Data::Order::Order order): order{ order }, next { nullptr } {}
+
+    /* TODO: Implement OrderBook class */
 }

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace TradingEngine::Order {
+namespace TradingEngine::Data::Order {
     enum class OrderType {
         LIMIT,
         MARKET

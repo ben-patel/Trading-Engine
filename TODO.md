@@ -1,3 +1,8 @@
+- add users/traders, ids
+- figure out params for execute trade
+- Add implementation for order book functions and constructor/init
+- Add modification for orders
+
 - more order types
 - db
 - server
