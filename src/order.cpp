@@ -1,7 +1,6 @@
 #include "order.h"
 
 namespace TradingEngine::Order {
-    // constructor def
     Order::Order(uint64_t id,
               uint32_t symbolId,
               OrderType type,
@@ -9,6 +8,6 @@ namespace TradingEngine::Order {
               OrderLifetime lifetime,
               int64_t price,
               uint32_t quantity
-    ): id{ id }, type{ type }, side{ side }, lifetime{ lifetime },
+    ): id{ id }, symbolId{ symbolId }, type{ type }, side{ side }, lifetime{ lifetime },
        price { price }, quantity { quantity } {}
 }

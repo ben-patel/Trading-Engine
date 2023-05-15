@@ -22,7 +22,7 @@ namespace TradingEngine::Order {
         GTC
     };
 
-    struct Order {
+    typedef struct Order {
         OrderSide side;
         OrderType type;
         OrderLifetime lifetime;
@@ -33,7 +33,6 @@ namespace TradingEngine::Order {
         int64_t price;
 
         Order() = default;
-
         Order(uint64_t id,
               uint32_t symbolId,
               OrderType type,
@@ -42,6 +41,6 @@ namespace TradingEngine::Order {
               int64_t price,
               uint32_t quantity
         );
-    };
+    } Order;
 }
 #endif
