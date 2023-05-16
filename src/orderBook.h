@@ -28,15 +28,15 @@ namespace TradingEngine::Data::LimitOrderBook {
     class LimitOrderBook {
     public:
         /* Array of prices which represents entire book */
-        static PricePoint pricePoints[MAX_PRICE];
-        static uint64_t orderId;
+        PricePoint pricePoints[MAX_PRICE];
+        uint64_t orderId;
         /* min and max repsective ask/bid prices */
-        static int64_t minAsk;
-        static int64_t maxBid;
-        static uint32_t symbolId;
+        int64_t minAsk;
+        int64_t maxBid;
+        uint32_t symbolId;
 
         /* Memory areana to avoid time-heavy heap operations */
-        static BookEntry entriesArena[MAX_NUM_ORDERS];
+        BookEntry entriesArena[MAX_NUM_ORDERS];
         std::unique_ptr<BookEntry> arenaPtr;
         #define ALLOCATE_ENTRY(id)
 
