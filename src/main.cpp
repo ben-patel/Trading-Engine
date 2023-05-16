@@ -1,6 +1,4 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <cstdint>
 #include "order.h"
 #include "orderBook.h"
@@ -9,10 +7,27 @@
 #define DEBUG_MODE
 
 #ifdef DEBUG_MODE
-void printOrder(TradingEngine::Data::Order::Order& o) {
-    std::vector<std::string> orderTypes{ "LIMIT", "MARKET" };
-    std::vector<std::string> orderSides{ "BUY", "SELL" };
-    std::vector<std::string> orderLifetimes{        
+/* Allocate memory on heap when 'new' function is called*/
+void* operator new(size_t size) {
+    #ifdef DEBUG_MODE
+    std::cout << "    DEBUG: ALLOCATING " << size << " BYTES OF MEMORY" << std::endl;
+    #endif
+    return malloc(size);
+}   
+
+/* Free memory when 'delete' is called */
+void operator delete (void *memory) {
+    #ifdef DEBUG_MODE
+    std::cout << "    DEBUG: FREEING MEMORY" << std::endl;
+    #endif
+    free(memory);
+}
+
+void printOrder(const TradingEngine::Data::Order::Order& o) {
+    /* use c_string arrays to avoid mem allocation */
+    const char* orderTypes[] = { "LIMIT", "MARKET" };
+    const char* orderSides[] = { "BUY", "SELL" };
+    const char* orderLifetimes[] = {        
         "FOK",
         "IOC",
         "GFD",
@@ -26,10 +41,10 @@ void printOrder(TradingEngine::Data::Order::Order& o) {
     std::cout << "  SIDE: " << orderSides[(uint8_t)o.side] << '\n';
     std::cout << "  LIFETIME: " << orderLifetimes[(uint8_t)o.lifetime] << '\n';
     std::cout << "  PRICE: " << o.price << '\n';
-    std::cout << "  QUANTITY: " << o.quantity << '\n';
+    std::cout << "  QUANTITY: " << o.quantity << std::endl;
 }
 
-void printEntry(TradingEngine::Data::LimitOrderBook::BookEntry& entry, bool orderPrint) {
+void printEntry(const TradingEngine::Data::LimitOrderBook::BookEntry& entry, bool orderPrint) {
     std::cout << "ENTRY: {\n";
     if (entry.next == nullptr) {
         std::cout << "  NEXT ENTRY: NULL\n";
