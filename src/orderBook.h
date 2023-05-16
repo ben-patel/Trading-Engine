@@ -3,11 +3,11 @@
 
 #include <memory>
 #include "order.h"
-#define MAX_PRICE 1000001
-#define MAX_NUM_ORDERS 1000001
 
 /* Limit order book inspired by QUANT CUP1 winner Voyager */
 namespace TradingEngine::Data::LimitOrderBook {
+    constexpr int64_t max_price { 1000001 };
+    constexpr size_t max_num_orders { 1000001 };
 
     /* single order in limit order book */
     typedef struct BookEntry {
@@ -28,7 +28,7 @@ namespace TradingEngine::Data::LimitOrderBook {
     class LimitOrderBook {
     public:
         /* Array of prices which represents entire book */
-        PricePoint pricePoints[MAX_PRICE];
+        PricePoint pricePoints[max_price];
         uint64_t orderId;
         /* min and max repsective ask/bid prices */
         int64_t minAsk;
@@ -36,7 +36,7 @@ namespace TradingEngine::Data::LimitOrderBook {
         uint32_t symbolId;
 
         /* Memory areana to avoid time-heavy heap operations */
-        BookEntry entriesArena[MAX_NUM_ORDERS];
+        BookEntry entriesArena[max_num_orders];
         std::unique_ptr<BookEntry> arenaPtr;
         #define ALLOCATE_ENTRY(id)
 

@@ -15,14 +15,6 @@ void* operator new(size_t size) {
     return malloc(size);
 }   
 
-/* Free memory when 'delete' is called */
-void operator delete (void *memory) {
-    #ifdef DEBUG_MODE
-    std::cout << "    DEBUG: FREEING MEMORY" << std::endl;
-    #endif
-    free(memory);
-}
-
 void printOrder(const TradingEngine::Data::Order::Order& o) {
     /* use c_string arrays to avoid mem allocation */
     const char* orderTypes[] = { "LIMIT", "MARKET" };
@@ -58,7 +50,7 @@ void printEntry(const TradingEngine::Data::LimitOrderBook::BookEntry& entry, boo
 #endif
 
 int main(void) {
-    TradingEngine::Data::Order::Order order {
+    const TradingEngine::Data::Order::Order order {
         1, // id
         2, // ticker
         TradingEngine::Data::Order::OrderType::LIMIT, 
@@ -68,10 +60,12 @@ int main(void) {
         100 // size
     };
 
-    TradingEngine::Data::LimitOrderBook::BookEntry entry { order };
-    
+    const TradingEngine::Data::LimitOrderBook::BookEntry entry { order };
+
     #ifdef DEBUG_MODE
     printEntry(entry, true);
+    std::cout << "\nRun \" export MallocStackLogging=1; leaks --atExit --list -- ./TE; unset MallocStackLogging; \" to debug memory leaks." << std::endl;
     #endif
+
     return 0;
 }

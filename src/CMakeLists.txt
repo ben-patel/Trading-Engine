@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS -Wextra)
 set(CMAKE_CXX_FLAGS -Wconversion)
 set(CMAKE_CXX_FLAGS -Wsign-conversion)
 
-# ignore warning for 'delete' memory function replacement
-set(CMAKE_CXX_FLAGS -Wno-implicit-exception-spec-mismatch)
+# debug 
+set(CMAKE_CXX_FLAGS -g)
 
 add_executable(${PROJECT_NAME} main.cpp order.cpp orderBook.cpp)
