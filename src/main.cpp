@@ -6,7 +6,6 @@
 // toggle debug
 #define DEBUG_MODE
 
-#ifdef DEBUG_MODE
 /* Allocate memory on heap when 'new' function is called*/
 void* operator new(size_t size) {
     #ifdef DEBUG_MODE
@@ -47,9 +46,8 @@ void printEntry(const TradingEngine::Data::LimitOrderBook::BookEntry& entry, boo
     if (orderPrint) printOrder(entry.order);
     std::cout << "}" << std::endl;
 }   
-#endif
 
-int main(void) {
+int main() {
     const TradingEngine::Data::Order::Order order {
         1, // id
         2, // ticker
