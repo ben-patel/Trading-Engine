@@ -1,6 +1,7 @@
 #ifndef ORDERBOOK_H
 #define ORDERBOOK_H
 
+#include <memory>
 #include "order.h"
 #define MAX_PRICE 1000001
 #define MAX_NUM_ORDERS 1000001
@@ -36,7 +37,7 @@ namespace TradingEngine::Data::LimitOrderBook {
 
         /* Memory areana to avoid time-heavy heap operations */
         static BookEntry entriesArena[MAX_NUM_ORDERS];
-        static BookEntry *arenaPtr;
+        std::unique_ptr<BookEntry> arenaPtr;
         #define ALLOCATE_ENTRY(id)
 
         LimitOrderBook();
