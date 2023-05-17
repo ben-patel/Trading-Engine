@@ -27,6 +27,7 @@ void printOrder(const TradingEngine::Data::Order::Order& o) {
 
     std::cout << "  ORDER ID: " << o.id << '\n';
     std::cout << "  SYMBOL ID: " << o.symbolId << '\n';
+    std::cout << "  USER ID: " << o.userId << '\n';
     std::cout << "  TYPE: " << orderTypes[(uint8_t)o.type] << '\n';
     std::cout << "  SIDE: " << orderSides[(uint8_t)o.side] << '\n';
     std::cout << "  LIFETIME: " << orderLifetimes[(uint8_t)o.lifetime] << '\n';
@@ -50,6 +51,7 @@ int main() {
     const TradingEngine::Data::Order::Order order {
         1, // id
         2, // ticker
+        0, // user id
         TradingEngine::Data::Order::OrderType::LIMIT, 
         TradingEngine::Data::Order::OrderSide::BUY,
         TradingEngine::Data::Order::OrderLifetime::GFD, 

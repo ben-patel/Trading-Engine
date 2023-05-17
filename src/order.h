@@ -31,6 +31,7 @@ namespace TradingEngine::Data::Order {
         
         /* id for stock symbol */
         uint64_t symbolId;
+        uint64_t userId;
         uint64_t quantity;
         int64_t price;
 
@@ -38,6 +39,7 @@ namespace TradingEngine::Data::Order {
         Order(
             uint64_t id,
             uint32_t symbolId,
+            uint64_t userId,
             OrderType type,
             OrderSide side,
             OrderLifetime lifetime,
