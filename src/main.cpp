@@ -15,10 +15,9 @@ void* operator new(size_t size) {
 }   
 
 void printOrder(const TradingEngine::Data::Order::Order& o) {
-    /* use c_string arrays to avoid mem allocation */
-    const char* orderTypes[] = { "LIMIT", "MARKET" };
-    const char* orderSides[] = { "BUY", "SELL" };
-    const char* orderLifetimes[] = {        
+    constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
+    constexpr std::string_view orderSides[] = { "BUY", "SELL" };
+    constexpr std::string_view orderLifetimes[] = {        
         "FOK",
         "IOC",
         "GFD",
