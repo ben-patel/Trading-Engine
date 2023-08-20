@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace TradingEngine::Data::Order {
+namespace TradingEngine::Order {
     enum class OrderType {
         LIMIT,
         MARKET
@@ -28,7 +28,7 @@ namespace TradingEngine::Data::Order {
         OrderLifetime lifetime;
 
         uint64_t id;
-        
+
         /* id for stock symbol */
         uint64_t symbolId;
         uint64_t userId;

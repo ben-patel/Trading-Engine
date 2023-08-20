@@ -1,6 +1,6 @@
 #include "order.h"
 
-namespace TradingEngine::Data::Order {
+namespace TradingEngine::Order {
     Order::Order(
         uint64_t id,
         uint32_t symbolId,

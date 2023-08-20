@@ -4,7 +4,7 @@
 #include "orderBook.h"
 
 // toggle debug
-#define DEBUG_MODE
+// #define DEBUG_MODE
 
 /* Allocate memory on heap when 'new' function is called*/
 void* operator new(size_t size) {
@@ -12,17 +12,17 @@ void* operator new(size_t size) {
     std::cout << "    DEBUG: ALLOCATING " << size << " BYTES OF MEMORY" << std::endl;
     #endif
     return malloc(size);
-}   
+}
 
-void printOrder(const TradingEngine::Data::Order::Order& o) {
+void printOrder(const TradingEngine::Order::Order& o) {
     constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
     constexpr std::string_view orderSides[] = { "BUY", "SELL" };
-    constexpr std::string_view orderLifetimes[] = {        
+    constexpr std::string_view orderLifetimes[] = {
         "FOK",
         "IOC",
         "GFD",
         "GTD",
-        "GTC" 
+        "GTC"
     };
 
     std::cout << "  ORDER ID: " << o.id << '\n';
@@ -35,7 +35,7 @@ void printOrder(const TradingEngine::Data::Order::Order& o) {
     std::cout << "  QUANTITY: " << o.quantity << std::endl;
 }
 
-void printEntry(const TradingEngine::Data::LimitOrderBook::BookEntry& entry, bool orderPrint) {
+void printEntry(const TradingEngine::LimitOrderBook::BookEntry& entry, bool orderPrint) {
     std::cout << "ENTRY: {\n";
     if (entry.next == nullptr) {
         std::cout << "  NEXT ENTRY: NULL\n";
@@ -45,25 +45,24 @@ void printEntry(const TradingEngine::Data::LimitOrderBook::BookEntry& entry, boo
 
     if (orderPrint) printOrder(entry.order);
     std::cout << "}" << std::endl;
-}   
+}
 
 int main() {
-    const TradingEngine::Data::Order::Order order {
+    const TradingEngine::Order::Order order {
         1, // id
         2, // ticker
         0, // user id
-        TradingEngine::Data::Order::OrderType::LIMIT, 
-        TradingEngine::Data::Order::OrderSide::BUY,
-        TradingEngine::Data::Order::OrderLifetime::GFD, 
+        TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::BUY,
+        TradingEngine::Order::OrderLifetime::GFD,
         10, // price
         100 // size
     };
 
-    const TradingEngine::Data::LimitOrderBook::BookEntry entry { order };
+    const TradingEngine::LimitOrderBook::BookEntry entry { order };
 
     #ifdef DEBUG_MODE
     printEntry(entry, true);
-    std::cout << "\nRun \" export MallocStackLogging=1; leaks --atExit --list -- ./TE; unset MallocStackLogging; \" to debug memory leaks." << std::endl;
     #endif
 
     return 0;
