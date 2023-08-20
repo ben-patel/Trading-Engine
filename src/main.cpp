@@ -50,7 +50,7 @@ void printEntry(const TradingEngine::LimitOrderBook::BookEntry& entry, bool orde
 int main() {
     const TradingEngine::Order::Order order {
         1, // id
-        2, // ticker
+        2, // symbol id
         0, // user id
         TradingEngine::Order::OrderType::LIMIT,
         TradingEngine::Order::OrderSide::BUY,
@@ -59,7 +59,8 @@ int main() {
         100 // size
     };
 
-    const TradingEngine::LimitOrderBook::BookEntry entry { order };
+    TradingEngine::LimitOrderBook::LimitOrderBook book {};
+    uint64_t orderId = book.processLimit(order.symbolId, order.userId, order.type, order.side, order.lifetime, order.price, order.quantity);
 
     #ifdef DEBUG_MODE
     printEntry(entry, true);

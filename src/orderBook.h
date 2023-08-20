@@ -2,12 +2,16 @@
 #define ORDERBOOK_H
 
 #include <memory>
+#include <vector>
 #include "order.h"
 
 /* Limit order book inspired by QUANT CUP1 winner Voyager */
 namespace TradingEngine::LimitOrderBook {
-    constexpr int64_t max_price { 1000001 };
-    constexpr size_t max_num_orders { 1000001 };
+    constexpr uint8_t TICKS_PER_UNIT { 100 };
+    constexpr int64_t MAX_PRICE { TICKS_PER_UNIT * 1000 };
+    constexpr uint64_t INVALID_ORDER_ID { 1000002 };
+    constexpr uint8_t EMPTY { 0 };
+    constexpr size_t MAX_NUM_ORDERS { 1000001 };
 
     /* single order in limit order book */
     typedef struct BookEntry {
@@ -26,27 +30,22 @@ namespace TradingEngine::LimitOrderBook {
 
     class LimitOrderBook {
     public:
-        /* Array of prices which represents entire book */
-        PricePoint pricePoints[max_price];
-        uint64_t orderId;
-        /* min and max repsective ask/bid prices */
+        std::vector<PricePoint> pricePoints;
+        std::vector<TradingEngine::Order::Order*> orderArena;
+        uint64_t currOrderId = 0;
         int64_t minAsk;
         int64_t maxBid;
         uint32_t symbolId;
 
-        /* Memory areana to avoid expensive heap operations */
-        BookEntry entriesArena[max_num_orders];
-        std::unique_ptr<BookEntry> arenaPtr;
-        #define ALLOCATE_ENTRY(id)
-
         LimitOrderBook();
-        void destroy();
-        void insertOrder(PricePoint *price, BookEntry *entry);
-        /* TODO: Figure out params */
-        void executeTrade();
-        uint64_t processLimit(TradingEngine::Order::Order order);
+        void insertOrder(TradingEngine::Order::Order& order);
+        /* TODO: execture trades */
+        void executeTrade(TradingEngine::Order::Order& order1, TradingEngine::Order::Order& order2, uint64_t quantity);
         void cancel(uint64_t orderId);
-        /* TODO: Add modification */
+        uint64_t processLimitBuy(TradingEngine::Order::Order& order);
+        uint64_t processLimitSell(TradingEngine::Order::Order& order);
+        uint64_t processLimit(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+            TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
     };
 
 }
