@@ -1,0 +1,8 @@
+#!/bin/dash
+
+export MallocStackLogging=1
+leaks --atExit --list -- ../build/TE
+unset MallocStackLogging
+
+pathname=$(pwd)
+export PATH="$PATH:$pathname"
