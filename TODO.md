@@ -1,11 +1,8 @@
-- figure out params for execute trade
-- Add implementation for order book functions and constructor/init
-- Add modification for orders
-
+- execute trade
+- add traders
+- modify order
 - more order types
 - db
 - server
-- matching engine
 - threads
 - reporter
-- add make
