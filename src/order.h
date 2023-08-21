@@ -46,6 +46,7 @@ namespace TradingEngine::Order {
             int64_t price,
             uint32_t quantity
         );
+        ~Order();
     } Order;
 }
 #endif

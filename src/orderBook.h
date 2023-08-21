@@ -15,35 +15,40 @@ namespace TradingEngine::LimitOrderBook {
 
     /* single order in limit order book */
     typedef struct BookEntry {
-        TradingEngine::Order::Order order;
-        BookEntry *next;
+        const std::shared_ptr<TradingEngine::Order::Order> order;
+        std::shared_ptr<BookEntry> next;
 
         BookEntry() = default;
-        BookEntry(TradingEngine::Order::Order order);
+        BookEntry(const std::shared_ptr<TradingEngine::Order::Order>& order) : order(order) {
+            next = nullptr;
+        };
     } BookEntry;
 
     /* single price point in limit order book */
     typedef struct PricePoint {
-        BookEntry *listStart;
-        BookEntry *listEnd;
+        std::shared_ptr<BookEntry> listStart;
+        std::shared_ptr<BookEntry> listEnd;
+
+        PricePoint();
     } PricePoint;
 
     class LimitOrderBook {
     public:
-        std::vector<PricePoint> pricePoints;
-        std::vector<TradingEngine::Order::Order*> orderArena;
-        uint64_t currOrderId = 0;
+        std::vector<std::shared_ptr<PricePoint>> pricePoints;
+        std::vector<std::shared_ptr<TradingEngine::Order::Order>> orderArena;
+        uint64_t currOrderId;
         int64_t minAsk;
         int64_t maxBid;
         uint32_t symbolId;
 
         LimitOrderBook();
-        void insertOrder(TradingEngine::Order::Order& order);
+        void insertOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
         /* TODO: execture trades */
         void executeTrade(TradingEngine::Order::Order& order1, TradingEngine::Order::Order& order2, uint64_t quantity);
         void cancel(uint64_t orderId);
-        uint64_t processLimitBuy(TradingEngine::Order::Order& order);
-        uint64_t processLimitSell(TradingEngine::Order::Order& order);
+        void destroy();
+        uint64_t processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order);
+        uint64_t processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order);
         uint64_t processLimit(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
             TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
     };

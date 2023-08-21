@@ -43,28 +43,26 @@ void printEntry(const TradingEngine::LimitOrderBook::BookEntry& entry, bool orde
         std::cout << "  NEXT ENTRY: NOT NULL\n";
     }
 
-    if (orderPrint) printOrder(entry.order);
+    if (orderPrint) printOrder(*entry.order);
     std::cout << "}" << std::endl;
 }
 
 int main() {
-    const TradingEngine::Order::Order order {
-        1, // id
-        2, // symbol id
-        0, // user id
-        TradingEngine::Order::OrderType::LIMIT,
-        TradingEngine::Order::OrderSide::BUY,
-        TradingEngine::Order::OrderLifetime::GFD,
-        10, // price
-        100 // size
-    };
+    TradingEngine::Order::OrderType type = TradingEngine::Order::OrderType::LIMIT;
+    TradingEngine::Order::OrderSide side = TradingEngine::Order::OrderSide::BUY;
+    TradingEngine::Order::OrderLifetime lifetime = TradingEngine::Order::OrderLifetime::GFD;
 
     TradingEngine::LimitOrderBook::LimitOrderBook book {};
-    uint64_t orderId = book.processLimit(order.symbolId, order.userId, order.type, order.side, order.lifetime, order.price, order.quantity);
+    book.processLimit(2, 1, type, side, lifetime, 10, 100); // 1
+    book.processLimit(2, 2, type, side, lifetime, 10, 50); // 2
+    book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::SELL,
+        TradingEngine::Order::OrderLifetime::GFD, 10, 10);
 
     #ifdef DEBUG_MODE
     printEntry(entry, true);
     #endif
 
+    book.destroy();
     return 0;
 }
