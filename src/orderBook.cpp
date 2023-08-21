@@ -30,8 +30,13 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    void LimitOrderBook::executeTrade(TradingEngine::Order::Order& order1, TradingEngine::Order::Order& order2, uint64_t quantity) {
-        std::cout << "executing " << quantity << " lots between orders " << order1.id << " and " << order2.id << '\n';
+    void LimitOrderBook::executeTrade(TradingEngine::Order::Order& order1, TradingEngine::Order::Order& order2, uint64_t quantity, int64_t price) {
+        uint64_t buyer = (order1.side == TradingEngine::Order::OrderSide::BUY) ? order1.id : order2.id;
+        uint64_t seller = (order1.side == TradingEngine::Order::OrderSide::SELL) ? order1.id : order2.id;
+        std::cout << "ORDER ID " << buyer << " BUY " << quantity << " @ " << price << '\n';
+        std::cout << "ORDER ID " << seller << " SELL " << quantity << " @ " << price << '\n';
+        std::cout << std::endl;
+
         order1.quantity -= quantity;
         order2.quantity -= quantity;
     }
@@ -49,6 +54,36 @@ namespace TradingEngine::LimitOrderBook {
         pricePoint->listEnd = entry;
     }
 
+    void LimitOrderBook::updateMinAsk(const uint64_t orderId) {
+        bool foundPrice = false;
+        for (size_t i = 0; i <= orderId; i++) {
+            std::shared_ptr<TradingEngine::Order::Order> order = orderArena[i];
+            if (order && order->side == TradingEngine::Order::OrderSide::SELL && order->quantity > EMPTY) {
+                foundPrice = true;
+                minAsk = std::min(minAsk, order->price);
+            }
+        }
+
+        if (!foundPrice) {
+            minAsk = MAX_PRICE;
+        }
+    }
+
+    void  LimitOrderBook::updateMaxBuy(const uint64_t orderId) {
+        bool foundPrice = false;
+        for (size_t i = 0; i <= orderId; i++) {
+            std::shared_ptr<TradingEngine::Order::Order> order = orderArena[i];
+            if (order && order->side == TradingEngine::Order::OrderSide::BUY && order->quantity > EMPTY) {
+                foundPrice = true;
+                maxBid = std::max(maxBid, order->price);
+            }
+        }
+
+        if (!foundPrice) {
+            maxBid = MIN_PRICE;
+        }
+    }
+
     uint64_t LimitOrderBook::processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order) {
         if (order->price >= minAsk) {
             do {
@@ -63,24 +98,23 @@ namespace TradingEngine::LimitOrderBook {
                     }
 
                     if (currOrder->quantity < order->quantity) {
-                        executeTrade(*currOrder, *order, currOrder->quantity);
+                        executeTrade(*currOrder, *order, currOrder->quantity, currOrder->price);
                         currEntry = currEntry->next;
                     } else {
-                        executeTrade(*order, *currOrder, order->quantity);
-                        currEntry = currEntry->next;
+                        executeTrade(*currOrder, *order, order->quantity, currOrder->price);
                         pricePoint->listStart = currEntry;
+                        updateMaxBuy(order->id);
                         return currOrderId;
                     }
                 }
 
-            pricePoint->listStart = nullptr;
-            minAsk++;
+                pricePoint->listStart = nullptr;
+                updateMinAsk(order->id);
             } while (order->price >= minAsk);
         }
 
         insertOrder(order);
-        if (maxBid < order->price) maxBid = order->price;
-
+        updateMaxBuy(order->id);
         return currOrderId;
     }
 
@@ -98,24 +132,23 @@ namespace TradingEngine::LimitOrderBook {
                     }
 
                     if (currOrder->quantity < order->quantity) {
-                        executeTrade(*currOrder, *order, currOrder->quantity);
+                        executeTrade(*currOrder, *order, currOrder->quantity, currOrder->price);
                         currEntry = currEntry->next;
                     } else {
-                        executeTrade(*order, *currOrder, order->quantity);
-                        currEntry = currEntry->next;
+                        executeTrade(*currOrder, *order, order->quantity, currOrder->price);
                         pricePoint->listStart = currEntry;
+                        updateMinAsk(order->id);
                         return currOrderId;
                     }
                 }
 
-            pricePoint->listStart = nullptr;
-            maxBid--;
+                pricePoint->listStart = nullptr;
+                updateMaxBuy(order->id);
             } while (order->price <= maxBid);
         }
 
         insertOrder(order);
-        if (minAsk < order->price) minAsk = order->price;
-
+        updateMinAsk(order->id);
         return currOrderId;
     }
 
@@ -142,6 +175,16 @@ namespace TradingEngine::LimitOrderBook {
         }
 
         return INVALID_ORDER_ID;
+    }
+
+    uint64_t LimitOrderBook::cancelOrder(uint64_t userId, uint64_t orderId) {
+        std::shared_ptr<TradingEngine::Order::Order> order = orderArena[orderId];
+        if (order->userId == userId) {
+            order->quantity = 0;
+            return order->id;
+        } else {
+            return INVALID_ORDER_ID;
+        }
     }
 
     void LimitOrderBook::destroy() {

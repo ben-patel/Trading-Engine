@@ -30,11 +30,24 @@ int main() {
     TradingEngine::Order::OrderLifetime lifetime = TradingEngine::Order::OrderLifetime::GFD;
 
     TradingEngine::LimitOrderBook::LimitOrderBook book {};
-    book.processLimit(2, 1, type, side, lifetime, 10, 100); // 1
-    book.processLimit(2, 2, type, side, lifetime, 10, 50); // 2
+    book.processLimit(2, 1, type, side, lifetime, 10, 100);
+    book.processLimit(2, 2, type, side, lifetime, 10, 50);
     book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
         TradingEngine::Order::OrderSide::SELL,
-        TradingEngine::Order::OrderLifetime::GFD, 10, 10);
+        TradingEngine::Order::OrderLifetime::GFD, 10, 110);
+    book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::SELL,
+        TradingEngine::Order::OrderLifetime::GFD, 10, 100);
+    book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::SELL,
+        TradingEngine::Order::OrderLifetime::GFD, 10, 100);
+    book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::BUY,
+        TradingEngine::Order::OrderLifetime::GFD, 10, 100);
+    book.cancelOrder(3, 5);
+    book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
+        TradingEngine::Order::OrderSide::BUY,
+        TradingEngine::Order::OrderLifetime::GFD, 10, 100);
 
     book.destroy();
     return 0;
