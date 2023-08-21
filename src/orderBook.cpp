@@ -12,8 +12,8 @@ namespace TradingEngine::LimitOrderBook {
         currOrderId = 0;
         minAsk = MAX_PRICE;
         maxBid = -1;
-        pricePoints = *(new std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE));
-        orderArena = *(new std::vector<std::shared_ptr<TradingEngine::Order::Order>>(MAX_NUM_ORDERS));
+        pricePoints = std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE);
+        orderArena = std::vector<std::shared_ptr<TradingEngine::Order::Order>>(MAX_NUM_ORDERS);
 
         for (size_t i = 0; i < MAX_PRICE; i++) {
             pricePoints[i] = std::make_shared<PricePoint>();
@@ -22,6 +22,8 @@ namespace TradingEngine::LimitOrderBook {
 
     void LimitOrderBook::executeTrade(TradingEngine::Order::Order& order1, TradingEngine::Order::Order& order2, uint64_t quantity) {
         std::cout << "executing " << quantity << " lots between orders " << order1.id << " and " << order2.id << '\n';
+        order1.quantity -= quantity;
+        order2.quantity -= quantity;
     }
 
     void LimitOrderBook::insertOrder(const std::shared_ptr<TradingEngine::Order::Order>& order) {

@@ -59,6 +59,9 @@ int main() {
         TradingEngine::Order::OrderSide::SELL,
         TradingEngine::Order::OrderLifetime::GFD, 10, 10);
 
+    std::cout << book.orderArena[1]->quantity << std::endl;
+    std::cout << book.orderArena[2]->quantity << std::endl;
+    std::cout << book.orderArena[3]->quantity << std::endl;
     #ifdef DEBUG_MODE
     printEntry(entry, true);
     #endif
