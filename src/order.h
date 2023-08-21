@@ -1,6 +1,4 @@
-#ifndef ORDER_H
-#define ORDER_H
-
+#pragma once
 #include <cstdint>
 
 namespace TradingEngine::Order {
@@ -46,7 +44,5 @@ namespace TradingEngine::Order {
             int64_t price,
             uint32_t quantity
         );
-        ~Order();
     } Order;
 }
-#endif

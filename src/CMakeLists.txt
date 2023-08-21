@@ -1,17 +1,15 @@
-cmake_minimum_required(VERSION 3.26.3) # as of 14.05.23
-project(TE)
+cmake_minimum_required(VERSION 3.26.3)
+project(engine)
 
 # compile in C++17
 set(CMAKE_CXX_STANDARD 17)
 
-# warning flags
-set(CMAKE_CXX_FLAGS -Wall)
-set(CMAKE_CXX_FLAGS -Weffc++)
-set(CMAKE_CXX_FLAGS -Wextra)
-set(CMAKE_CXX_FLAGS -Wconversion)
-set(CMAKE_CXX_FLAGS -Wsign-conversion)
+# gtest library
+add_subdirectory(googletest)
+# run tests: ./tests
+add_executable(tests tests/testInsertBook.cpp order.cpp orderBook.cpp)
+target_link_libraries(tests gtest_main)
 
-# debug 
-set(CMAKE_CXX_FLAGS -g)
-
+# run main: ./engine
 add_executable(${PROJECT_NAME} main.cpp order.cpp orderBook.cpp)
+target_compile_options(${PROJECT_NAME} PRIVATE -Weffc++ -Wextra -Wconversion -Wsign-conversion)

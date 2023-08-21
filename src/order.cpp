@@ -12,11 +12,5 @@ namespace TradingEngine::Order {
         int64_t price,
         uint32_t quantity
     ): id{ id }, symbolId{ symbolId }, userId { userId }, type{ type }, side{ side }, lifetime{ lifetime },
-       price { price }, quantity { quantity } {
-            std::cout << "created order " << id << std::endl;
-       }
-
-    Order::~Order() {
-        std::cout << "destroyed order " << id << std::endl;
-    }
+       price { price }, quantity { quantity } {}
 }

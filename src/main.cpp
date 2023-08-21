@@ -3,17 +3,6 @@
 #include "order.h"
 #include "orderBook.h"
 
-// toggle debug
-// #define DEBUG_MODE
-
-/* Allocate memory on heap when 'new' function is called*/
-void* operator new(size_t size) {
-    #ifdef DEBUG_MODE
-    std::cout << "    DEBUG: ALLOCATING " << size << " BYTES OF MEMORY" << std::endl;
-    #endif
-    return malloc(size);
-}
-
 void printOrder(const TradingEngine::Order::Order& o) {
     constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
     constexpr std::string_view orderSides[] = { "BUY", "SELL" };
@@ -35,18 +24,6 @@ void printOrder(const TradingEngine::Order::Order& o) {
     std::cout << "  QUANTITY: " << o.quantity << std::endl;
 }
 
-void printEntry(const TradingEngine::LimitOrderBook::BookEntry& entry, bool orderPrint) {
-    std::cout << "ENTRY: {\n";
-    if (entry.next == nullptr) {
-        std::cout << "  NEXT ENTRY: NULL\n";
-    } else {
-        std::cout << "  NEXT ENTRY: NOT NULL\n";
-    }
-
-    if (orderPrint) printOrder(*entry.order);
-    std::cout << "}" << std::endl;
-}
-
 int main() {
     TradingEngine::Order::OrderType type = TradingEngine::Order::OrderType::LIMIT;
     TradingEngine::Order::OrderSide side = TradingEngine::Order::OrderSide::BUY;
@@ -58,13 +35,6 @@ int main() {
     book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
         TradingEngine::Order::OrderSide::SELL,
         TradingEngine::Order::OrderLifetime::GFD, 10, 10);
-
-    std::cout << book.orderArena[1]->quantity << std::endl;
-    std::cout << book.orderArena[2]->quantity << std::endl;
-    std::cout << book.orderArena[3]->quantity << std::endl;
-    #ifdef DEBUG_MODE
-    printEntry(entry, true);
-    #endif
 
     book.destroy();
     return 0;
