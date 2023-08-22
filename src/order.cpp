@@ -10,7 +10,8 @@ namespace TradingEngine::Order {
         OrderSide side,
         OrderLifetime lifetime,
         int64_t price,
-        uint32_t quantity
+        uint32_t quantity,
+        bool isActive
     ): id{ id }, symbolId{ symbolId }, userId { userId }, type{ type }, side{ side }, lifetime{ lifetime },
-       price { price }, quantity { quantity } {}
+       price { price }, quantity { quantity }, isActive { isActive } {}
 }

@@ -24,14 +24,12 @@ namespace TradingEngine::Order {
         OrderSide side;
         OrderType type;
         OrderLifetime lifetime;
-
         uint64_t id;
-
-        /* id for stock symbol */
         uint64_t symbolId;
         uint64_t userId;
         uint64_t quantity;
         int64_t price;
+        bool isActive;
 
         Order() = default;
         Order(
@@ -42,7 +40,8 @@ namespace TradingEngine::Order {
             OrderSide side,
             OrderLifetime lifetime,
             int64_t price,
-            uint32_t quantity
+            uint32_t quantity,
+            bool isActive
         );
     } Order;
 }

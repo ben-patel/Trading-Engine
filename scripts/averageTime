@@ -1,0 +1,11 @@
+#!/bin/bash
+numOrders="$1"
+
+sum=0.0
+for i in {1..50}; do
+    time=$(../build/engine "$numOrders")
+    sum=$(echo "$sum + $time" | bc)
+    i=$((i+1))
+done
+
+echo "$sum"
