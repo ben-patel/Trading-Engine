@@ -1,4 +1,11 @@
 #!/bin/bash
+
+#################################################
+##     NOTE THIS SCRIPT NO LONGER WORKS        ##
+##      IT WAS ONLY USED FOR TIMING THE        ##
+##                ORDERBOOK                    ##
+#################################################
+
 numOrders="$1"
 
 sum=0.0

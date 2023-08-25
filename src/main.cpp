@@ -2,8 +2,9 @@
 #include <cstdint>
 #include <chrono>
 #include <iomanip>
-#include "order.h"
-#include "orderBook.h"
+#include "orders/order.hpp"
+#include "orders/orderBook.hpp"
+#include "exchange.hpp"
 
 void printOrder(const TradingEngine::Order::Order& o) {
     constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
@@ -39,11 +40,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    TradingEngine::Exchange::Exchange& exchange = TradingEngine::Exchange::Exchange::getInstance();
+    std::cout << exchange.addInstrument("GME") << std::endl;
+    std::cout << exchange.addInstrument("GME") << std::endl;
+
     TradingEngine::Order::OrderType type = TradingEngine::Order::OrderType::LIMIT;
     TradingEngine::Order::OrderSide side = TradingEngine::Order::OrderSide::BUY;
     TradingEngine::Order::OrderLifetime lifetime = TradingEngine::Order::OrderLifetime::GFD;
 
-    TradingEngine::LimitOrderBook::LimitOrderBook book {};
+    TradingEngine::LimitOrderBook::LimitOrderBook book {1, false};
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < atoi(argv[1]); i++) {

@@ -1,4 +1,7 @@
 - execute trade
+- const stuff
+- fix int sizes
+- Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
 - add traders
 - modify order
 - more order types
