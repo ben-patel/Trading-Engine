@@ -1,90 +1,56 @@
 #include <iostream>
 #include <cstdint>
 #include <chrono>
+#include <time.h>
 #include <iomanip>
 #include "orders/order.hpp"
 #include "orders/orderBook.hpp"
 #include "exchange.hpp"
 
-void printOrder(const TradingEngine::Order::Order& o) {
-    constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
-    constexpr std::string_view orderSides[] = { "BUY", "SELL" };
-    constexpr std::string_view orderLifetimes[] = {
-        "FOK",
-        "IOC",
-        "GFD",
-        "GTD",
-        "GTC"
+int main(int argc, char * argv[]) {
+    TradingEngine::Exchange::Exchange& exchange = TradingEngine::Exchange::Exchange::getInstance();
+    const char* mostTradedStocks[] = {
+        "AAPL",  // Apple Inc.
+        "MSFT",  // Microsoft Corporation
+        "AMZN",  // Amazon.com Inc.
+        "GOOGL", // Alphabet Inc. (Google)
+        "TSLA",  // Tesla Inc.
+        "FB",    // Facebook Inc.
+        "BRK.B", // Berkshire Hathaway Inc.
+        "NVDA",  // NVIDIA Corporation
+        "JPM",   // JPMorgan Chase & Co.
+        "V",     // Visa Inc.
+        "JNJ",   // Johnson & Johnson
+        "PG",    // Procter & Gamble Co.
+        "UNH",   // UnitedHealth Group Incorporated
+        "MA",    // Mastercard Incorporated
+        "HD",    // The Home Depot Inc.
+        "PYPL",  // PayPal Holdings Inc.
+        "BABA",  // Alibaba Group Holding Limited
+        "DIS",   // The Walt Disney Company
+        "VZ",    // Verizon Communications Inc.
+        "BAC"    // Bank of America Corporation
     };
 
-    std::cout << "  ORDER ID: " << o.id << '\n';
-    std::cout << "  SYMBOL ID: " << o.symbolId << '\n';
-    std::cout << "  USER ID: " << o.userId << '\n';
-    std::cout << "  TYPE: " << orderTypes[(uint8_t)o.type] << '\n';
-    std::cout << "  SIDE: " << orderSides[(uint8_t)o.side] << '\n';
-    std::cout << "  LIFETIME: " << orderLifetimes[(uint8_t)o.lifetime] << '\n';
-    std::cout << "  PRICE: " << o.price << '\n';
-    std::cout << "  QUANTITY: " << o.quantity << std::endl;
-}
-
-void print(std::multiset<int64_t> myMultiset) {
-    for (std::multiset<int64_t>::iterator it = myMultiset.begin(); it != myMultiset.end(); ++it) {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
-}
-
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cout << "Enter number of orders" << std::endl;
-        return 1;
+    for (int i = 0; i < 20; i++) {
+        exchange.addInstrument(mostTradedStocks[i]);
     }
 
-    TradingEngine::Exchange::Exchange& exchange = TradingEngine::Exchange::Exchange::getInstance();
-    std::cout << exchange.addInstrument("GME") << std::endl;
-    std::cout << exchange.addInstrument("GME") << std::endl;
+    float time = 0.0;
+    for (size_t i = 0; i <= atoi(argv[1]); i++) {
+        int ii = rand()%20;
+        int j = rand()%20;
+        int v1 = rand()%500 + 1;
+        int v2 = rand()%500 + 1;
 
-    TradingEngine::Order::OrderType type = TradingEngine::Order::OrderType::LIMIT;
-    TradingEngine::Order::OrderSide side = TradingEngine::Order::OrderSide::BUY;
-    TradingEngine::Order::OrderLifetime lifetime = TradingEngine::Order::OrderLifetime::GFD;
+        TradingEngine::Order::OrderSide side = (v1 % 2) ? TradingEngine::Order::OrderSide::BUY : TradingEngine::Order::OrderSide::SELL;
+        auto start = std::chrono::high_resolution_clock::now();
+        exchange.sendOrder(ii, 0, TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2);
+        auto end = std::chrono::high_resolution_clock::now();
 
-    TradingEngine::LimitOrderBook::LimitOrderBook book {1, false};
-    auto start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < atoi(argv[1]); i++) {
-        uint32_t q = (uint32_t)(rand() % 998) + 1;
-        int64_t price = (uint32_t)(rand() % 998) + 1;
-        uint64_t id;
-
-        if (i%2 == 0) {
-            // std::cout << "book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,\n";
-            // std::cout << "TradingEngine::Order::OrderSide::BUY,\n";
-            // std::cout << "TradingEngine::Order::OrderLifetime::GFD, " << price << ", " << q <<");\n";
-
-            id = book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
-                TradingEngine::Order::OrderSide::BUY,
-                TradingEngine::Order::OrderLifetime::GFD, price, q);
-        } else {
-            // std::cout << "book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,\n";
-            // std::cout << "TradingEngine::Order::OrderSide::SELL,\n";
-            // std::cout << "TradingEngine::Order::OrderLifetime::GFD, " << price << ", " << q << ");\n";
-            id = book.processLimit(1, 3, TradingEngine::Order::OrderType::LIMIT,
-                TradingEngine::Order::OrderSide::SELL,
-                TradingEngine::Order::OrderLifetime::GFD, price, q);
-        }
-
-        if (q > 800) {
-           // book.cancelOrder(3, id);
-            //std::cout << "book.cancelOrder(3, " << id << ")\n";
-        }
-
-        //std::cout << std::endl;
+        time += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration<double>(end - start).count();
-    std::cout << std::fixed << std::setprecision(6) << duration << std::endl;
-
-    book.destroy();
+    std::cout << time / 1000000 << std::endl;
     return 0;
 }
