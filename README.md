@@ -11,3 +11,6 @@ Seconds | 0.000237 | 0.00182 | 0.0183 | 0.270 | 2.684
 N. orders | 100 | 1k | 10k | 100k | 1M
 --- | --- | --- | --- |--- |---
 Seconds | 0.0000622 | 0.000254 | 0.00184 | 0.0210 | 0.421
+
+#### Note, my laptop can only run 8 threads at once, so multithreading in this case is extremely slow :\(
+#### In reality it would be way quicker, as we run a seperate thread for each orderbook.

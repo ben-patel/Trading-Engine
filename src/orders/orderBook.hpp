@@ -5,14 +5,17 @@
 #include <set>
 #include "order.hpp"
 
-/* Limit order book inspired by QUANT CUP1 winner Voyager */
+/* Can easily increase the below constants, but I'm running this on my laptop, which
+   is not exactly the same architecture as the NASDAQ. I'll keep my memory please. */
+
+/* Prices are represented as whole integers, but in cents. e.g. 100 = $1.00, 2506 = $25.06 */
 namespace TradingEngine::LimitOrderBook {
     constexpr uint8_t TICKS_PER_UNIT { 100 };
     constexpr int64_t MAX_PRICE { TICKS_PER_UNIT * 1000 };
     constexpr int8_t MIN_PRICE { -1 };
     constexpr uint64_t INVALID_ORDER_ID { 1000002 };
     constexpr uint8_t EMPTY { 0 };
-    constexpr size_t MAX_NUM_ORDERS { 1000002 };
+    constexpr size_t MAX_NUM_ORDERS { 100000 }; // 100k
 
     /* Order book entry */
     typedef struct BookEntry {
