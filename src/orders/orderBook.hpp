@@ -15,7 +15,7 @@ namespace TradingEngine::LimitOrderBook {
     constexpr int8_t MIN_PRICE { -1 };
     constexpr uint64_t INVALID_ORDER_ID { 1000002 };
     constexpr uint8_t EMPTY { 0 };
-    constexpr size_t MAX_NUM_ORDERS { 100000 }; // 100k
+    constexpr size_t MAX_NUM_ORDERS { 1000002 }; // 100k
 
     /* Order book entry */
     typedef struct BookEntry {
@@ -44,7 +44,7 @@ namespace TradingEngine::LimitOrderBook {
         LimitOrderBook(uint32_t symbolId, bool printLogs);
 
         /* Add order with given info to book */
-        uint64_t addOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+        void addOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
 
         // TODO: exectute trade method
@@ -54,7 +54,7 @@ namespace TradingEngine::LimitOrderBook {
         void insertOrder(std::shared_ptr<PricePoint> pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order);
 
         /* Inserts limit order to book */
-        uint64_t processLimit(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+        void processLimit(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
             TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
 
         /* Free book memory */
@@ -70,7 +70,6 @@ namespace TradingEngine::LimitOrderBook {
         std::multiset<int64_t> askPrices;
         void printOrder(TradingEngine::Order::Order& o);
         void printList(std::shared_ptr<BookEntry> curr);
-        uint64_t currOrderId;
         int64_t minAsk;
         int64_t maxBid;
         uint32_t symbolId;
@@ -78,8 +77,8 @@ namespace TradingEngine::LimitOrderBook {
 
         void updateMinAsk();
         void updateMaxBuy();
-        uint64_t processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order);
-        uint64_t processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order);
+        void processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order);
+        void processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order);
     };
 
 }

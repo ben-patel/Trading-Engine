@@ -3,7 +3,7 @@
 #include <chrono>
 #include <future>
 #include "exchange.hpp"
-#define PRINT_LOGS false // NOTE TAKES 5x LONGER WITH this ENABLED
+#define PRINT_LOGS false // NOTE TAKES 5-10x LONGER WHEN ENABLED
 
 namespace TradingEngine::Exchange {
     Instrument::Instrument(uint32_t symbolId, std::string_view symbol) {
@@ -24,21 +24,27 @@ namespace TradingEngine::Exchange {
     }
 
     void Exchange::cancelOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId) {
+        if (instrumentThreads[symbolId] && instrumentThreads[symbolId]->joinable()) {
+            instrumentThreads[symbolId]->join();
+        }
+
         instruments[symbolId]->orderBook.cancelOrder(userId, orderId);
     }
 
-    void Exchange::sendOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+    uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
-        //instruments[symbolId]->orderBook.addOrder(symbolId, userId, type, side, lifetime, price, quantity);
+        //instruments[symbolId]->orderBook.addOrder(symbolId, userId, type, side, lifetime, price, quantity); // single thread approach
+        currOrderId.fetch_add(1);
 
         if (instrumentThreads[symbolId] != nullptr && instrumentThreads[symbolId]->joinable()) {
             instrumentThreads[symbolId]->join();
         }
 
         instrumentThreads[symbolId] = std::make_unique<std::thread>([this, symbolId, userId, type, side, lifetime, price, quantity]() {
-            instruments[symbolId]->orderBook.addOrder(symbolId, userId, type, side, lifetime, price, quantity);
+            instruments[symbolId]->orderBook.addOrder(symbolId, currOrderId, userId, type, side, lifetime, price, quantity);
         });
 
+        return currOrderId;
     }
 
     void Exchange::destroy() {

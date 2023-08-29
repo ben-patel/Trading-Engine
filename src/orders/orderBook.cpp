@@ -8,13 +8,13 @@
 #include "order.hpp"
 
 namespace TradingEngine::LimitOrderBook {
+    std::mutex lock;
     PricePoint::PricePoint() {
         listStart = nullptr;
         listEnd = nullptr;
     }
 
     LimitOrderBook::LimitOrderBook(uint32_t symbolId, bool printLogs) {
-        currOrderId = 0;
         minAsk = MAX_PRICE;
         maxBid = -1;
         pricePoints = std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE);
@@ -29,13 +29,12 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    uint64_t LimitOrderBook::addOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+    void LimitOrderBook::addOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
         if (type == TradingEngine::Order::OrderType::LIMIT) {
-            return processLimit(symbolId, userId, type, side, lifetime, price, quantity);
+            processLimit(symbolId, orderId, userId, type, side, lifetime, price, quantity);
         } else {
-            /* Only supports limit orders RN. */
-            return INVALID_ORDER_ID;
+            throw std::runtime_error("ERROR: Only accepting limit orders right now.");
         }
     }
 
@@ -66,21 +65,19 @@ namespace TradingEngine::LimitOrderBook {
     }
 
     std::string getTime() {
-        using std::chrono::system_clock;
-        auto currentTime = std::chrono::system_clock::now();
-        char buffer[80];
+        auto now = std::chrono::system_clock::now();
+        auto now_c = std::chrono::system_clock::to_time_t(now);
+        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+        auto micros = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()) % 1000000;
 
-        auto transformed = currentTime.time_since_epoch().count() / 1000000;
+        struct tm timeinfo;
+        localtime_r(&now_c, &timeinfo);
 
-        auto millis = transformed % 1000;
-
-        std::time_t tt;
-        tt = system_clock::to_time_t ( currentTime );
-        auto timeinfo = localtime (&tt);
-        strftime (buffer,80,"%H:%M:%S",timeinfo);
-        sprintf(buffer, "%s:%03d",buffer,(int)millis);
-
-        return std::string(buffer);
+        std::ostringstream oss;
+        oss << std::put_time(&timeinfo, "%H:%M:%S")
+            << ":" << std::setw(3) << std::setfill('0') << millis.count()
+            << ":" << std::setw(6) << std::setfill('0') << micros.count();
+        return oss.str();
     }
 
     void LimitOrderBook::executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price) {
@@ -88,7 +85,11 @@ namespace TradingEngine::LimitOrderBook {
         uint64_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
 
         if (printLogs) {
+            lock.lock();
             std::cout << getTime() << ": " << order1->symbolId << " TRADE " << quantity << " @ " << price << std::endl;
+            //std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            std::cout << std::flush;
+            lock.unlock();
         }
 
         if (order1->side == order2->side) {
@@ -132,7 +133,7 @@ namespace TradingEngine::LimitOrderBook {
         maxBid = !bidPrices.empty() ? *(bidPrices.rbegin()) : MIN_PRICE;
     }
 
-    uint64_t LimitOrderBook::processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order) {
+    void LimitOrderBook::processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order) {
         updateMinAsk();
 
         while (order->price >= minAsk) {
@@ -154,7 +155,7 @@ namespace TradingEngine::LimitOrderBook {
                     pricePoint->listStart = currEntry;
                     updateMaxBuy();
 
-                    return currOrderId;
+                    return;
                 }
             }
 
@@ -167,10 +168,10 @@ namespace TradingEngine::LimitOrderBook {
         insertOrder(pricePoints[(size_t)order->price], order);
         updateMaxBuy();
 
-        return currOrderId;
+        return;
     }
 
-    uint64_t LimitOrderBook::processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order) {
+    void LimitOrderBook::processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order) {
         updateMaxBuy();
 
         while (order->price <= maxBid) {
@@ -193,7 +194,7 @@ namespace TradingEngine::LimitOrderBook {
                     pricePoint->listStart = currEntry;
                     updateMinAsk();
 
-                    return currOrderId;
+                    return;
                 }
             }
 
@@ -205,18 +206,17 @@ namespace TradingEngine::LimitOrderBook {
         askPrices.insert(order->price);
         insertOrder(pricePoints[(size_t)order->price], order);
         updateMinAsk();
-        return currOrderId;
+        return;
     }
 
-    uint64_t LimitOrderBook::processLimit(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+    void LimitOrderBook::processLimit(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
         if (quantity <= 0) {
             throw std::runtime_error("ERROR: INVALID ORDER QUANTITY");
         }
 
-        currOrderId++;
         std::shared_ptr<TradingEngine::Order::Order> order = std::make_shared<TradingEngine::Order::Order>(
-            currOrderId,
+            orderId,
             symbolId,
             userId,
             type,
@@ -227,18 +227,18 @@ namespace TradingEngine::LimitOrderBook {
             false
         );
 
-        orderArena[currOrderId] = order;
+        orderArena[orderId] = order;
         if (order->side == TradingEngine::Order::OrderSide::BUY) {
-            return processLimitBuy(order);
+            processLimitBuy(order);
         } else if (order->side == TradingEngine::Order::OrderSide::SELL) {
-            return processLimitSell(order);
+            processLimitSell(order);
         }
 
-        return INVALID_ORDER_ID;
     }
 
     uint64_t LimitOrderBook::cancelOrder(uint64_t userId, uint64_t orderId) {
         std::shared_ptr<TradingEngine::Order::Order> order = orderArena[orderId];
+
         if (order->userId != userId) {
              return INVALID_ORDER_ID;
         }
@@ -251,6 +251,13 @@ namespace TradingEngine::LimitOrderBook {
 
         order->quantity = 0;
         order->isActive = false;
+
+        if (printLogs) {
+            lock.lock();
+            std::cout << getTime() << ": " << orderId << " CANCEL" << std::endl;
+            //std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            lock.unlock();
+        }
         return order->id;
     }
 
