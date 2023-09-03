@@ -1,16 +1,10 @@
-- make cancelling multi threaded
-
 - execute trade
-- const stuff
-- fix int sizes
-- fix namespaces
-- fix return values
-- fix pass by constrr
-- Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
 - add traders
+- fix int sizes + return values etc.
 - modify order
+- fix namespaces
+- Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
 - more order types
 - db
 - server
-- threads
 - reporter

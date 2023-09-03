@@ -5,8 +5,8 @@
 #include <set>
 #include "order.hpp"
 
-/* Can easily increase the below constants, but I'm running this on my laptop, which
-   is not exactly the same architecture as the NASDAQ. I'll keep my memory please. */
+/* Can easily increase the below constants, but I'm running this on my laptop, not exactly
+   the scale a real stock exchange requires. */
 
 /* Prices are represented as whole integers, but in cents. e.g. 100 = $1.00, 2506 = $25.06 */
 namespace TradingEngine::LimitOrderBook {
@@ -15,7 +15,7 @@ namespace TradingEngine::LimitOrderBook {
     constexpr int8_t MIN_PRICE { -1 };
     constexpr uint64_t INVALID_ORDER_ID { 1000002 };
     constexpr uint8_t EMPTY { 0 };
-    constexpr size_t MAX_NUM_ORDERS { 1000002 }; // 100k
+    constexpr size_t MAX_NUM_ORDERS { 1000001 };
 
     /* Order book entry */
     typedef struct BookEntry {
@@ -38,7 +38,6 @@ namespace TradingEngine::LimitOrderBook {
 
     class LimitOrderBook {
     public:
-
         LimitOrderBook() = default;
         /* Allocates memory for book */
         LimitOrderBook(uint32_t symbolId, bool printLogs);
@@ -47,11 +46,10 @@ namespace TradingEngine::LimitOrderBook {
         void addOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
 
-        // TODO: exectute trade method
         void executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price);
 
         /* Inserts given order into the appropriate price point list */
-        void insertOrder(std::shared_ptr<PricePoint> pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order);
+        void insertOrder(std::shared_ptr<PricePoint>& pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order);
 
         /* Inserts limit order to book */
         void processLimit(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
@@ -68,8 +66,6 @@ namespace TradingEngine::LimitOrderBook {
         std::vector<std::shared_ptr<TradingEngine::Order::Order>> orderArena;
         std::multiset<int64_t> bidPrices;
         std::multiset<int64_t> askPrices;
-        void printOrder(TradingEngine::Order::Order& o);
-        void printList(std::shared_ptr<BookEntry> curr);
         int64_t minAsk;
         int64_t maxBid;
         uint32_t symbolId;

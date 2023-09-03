@@ -38,32 +38,6 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    void LimitOrderBook::printOrder(TradingEngine::Order::Order& o) {
-        constexpr std::string_view orderTypes[] = { "LIMIT", "MARKET" };
-        constexpr std::string_view orderSides[] = { "BUY", "SELL" };
-        constexpr std::string_view orderLifetimes[] = {
-            "FOK",
-            "IOC",
-            "GFD",
-            "GTD",
-            "GTC"
-        };
-
-        std::cout << "  ORDER ID: " << o.id << '\n';
-        std::cout << "  SIDE: " << orderSides[(uint8_t)o.side] << '\n';
-        std::cout << "  PRICE: " << o.price << '\n';
-        std::cout << "  QUANTITY: " << o.quantity << std::endl;
-        std::cout << std::endl;
-    }
-
-    void LimitOrderBook::printList(std::shared_ptr<BookEntry> curr) {
-        while (curr != nullptr) {
-            TradingEngine::Order::Order o = *(curr->order);
-            printOrder(o);
-            curr = curr->next;
-        }
-    }
-
     std::string getTime() {
         auto now = std::chrono::system_clock::now();
         auto now_c = std::chrono::system_clock::to_time_t(now);
@@ -113,7 +87,7 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    void LimitOrderBook::insertOrder(std::shared_ptr<PricePoint> pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order) {
+    void LimitOrderBook::insertOrder(std::shared_ptr<PricePoint>& pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order) {
         std::shared_ptr<BookEntry> entry = std::make_shared<BookEntry>(order);
 
         if (pricePoint->listStart == nullptr) {

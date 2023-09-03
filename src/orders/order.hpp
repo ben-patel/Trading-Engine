@@ -20,7 +20,7 @@ namespace TradingEngine::Order {
         GTC
     };
 
-    typedef struct Order {
+    struct Order {
         OrderSide side;
         OrderType type;
         OrderLifetime lifetime;
@@ -43,5 +43,5 @@ namespace TradingEngine::Order {
             uint32_t quantity,
             bool isActive
         );
-    } Order;
+    };
 }

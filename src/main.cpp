@@ -37,7 +37,7 @@ int main() {
     }
 
     float time = 0.0;
-    for (size_t i = 0; i < 1000000; i++) {
+    for (size_t i = 0; i < 1000; i++) {
         int ii = rand()%100;
         int j = rand()%100;
         int v1 = rand()%500 + 1;
