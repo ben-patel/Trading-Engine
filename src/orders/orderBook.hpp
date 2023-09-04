@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 #include <vector>
 #include <set>
@@ -63,7 +62,6 @@ namespace TradingEngine::LimitOrderBook {
 
     private:
         std::vector<std::shared_ptr<PricePoint>> pricePoints;
-        std::vector<std::shared_ptr<TradingEngine::Order::Order>> orderArena;
         std::multiset<int64_t> bidPrices;
         std::multiset<int64_t> askPrices;
         int64_t minAsk;

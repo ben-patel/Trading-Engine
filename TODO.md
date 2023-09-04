@@ -1,5 +1,10 @@
+- fix single responsibility, really think about what should do what
 - execute trade
+- refactor orderArena + add traderArena
 - add traders
+- error + edge case handling
+- const stuff
+- make struct defs consistent
 - fix int sizes + return values etc.
 - modify order
 - fix namespaces

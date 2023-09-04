@@ -183,25 +183,7 @@ namespace TradingEngine::LimitOrderBook {
         return;
     }
 
-    void LimitOrderBook::processLimit(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
-        if (quantity <= 0) {
-            throw std::runtime_error("ERROR: INVALID ORDER QUANTITY");
-        }
-
-        std::shared_ptr<TradingEngine::Order::Order> order = std::make_shared<TradingEngine::Order::Order>(
-            orderId,
-            symbolId,
-            userId,
-            type,
-            side,
-            lifetime,
-            price,
-            quantity,
-            false
-        );
-
-        orderArena[orderId] = order;
+    void LimitOrderBook::processLimit(const std::shared_ptr<TradingEngine::Order::Order>& order) {
         if (order->side == TradingEngine::Order::OrderSide::BUY) {
             processLimitBuy(order);
         } else if (order->side == TradingEngine::Order::OrderSide::SELL) {
