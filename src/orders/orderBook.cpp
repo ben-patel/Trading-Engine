@@ -18,7 +18,6 @@ namespace TradingEngine::LimitOrderBook {
         minAsk = MAX_PRICE;
         maxBid = -1;
         pricePoints = std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE);
-        orderArena = std::vector<std::shared_ptr<TradingEngine::Order::Order>>(MAX_NUM_ORDERS);
         bidPrices = std::multiset<int64_t>();
         askPrices = std::multiset<int64_t>();
         this->printLogs = printLogs;
@@ -29,10 +28,9 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    void LimitOrderBook::addOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
-        if (type == TradingEngine::Order::OrderType::LIMIT) {
-            processLimit(symbolId, orderId, userId, type, side, lifetime, price, quantity);
+    void LimitOrderBook::addOrder(const std::shared_ptr<TradingEngine::Order::Order>& order) {
+        if (order->type == TradingEngine::Order::OrderType::LIMIT) {
+            processLimit(order);
         } else {
             throw std::runtime_error("ERROR: Only accepting limit orders right now.");
         }
@@ -193,28 +191,27 @@ namespace TradingEngine::LimitOrderBook {
     }
 
     uint64_t LimitOrderBook::cancelOrder(uint64_t userId, uint64_t orderId) {
-        std::shared_ptr<TradingEngine::Order::Order> order = orderArena[orderId];
+        // std::shared_ptr<TradingEngine::Order::Order> order = orderArena[orderId];
 
-        if (order->userId != userId) {
-             return INVALID_ORDER_ID;
-        }
+        // if (order->userId != userId) {
+        //      return INVALID_ORDER_ID;
+        // }
 
-        if (order->side == TradingEngine::Order::OrderSide::BUY && order->isActive) {
-            bidPrices.erase(bidPrices.find(order->price));
-        } else if (order->isActive) {
-            askPrices.erase(askPrices.find(order->price));
-        }
+        // if (order->side == TradingEngine::Order::OrderSide::BUY && order->isActive) {
+        //     bidPrices.erase(bidPrices.find(order->price));
+        // } else if (order->isActive) {
+        //     askPrices.erase(askPrices.find(order->price));
+        // }
 
-        order->quantity = 0;
-        order->isActive = false;
+        // order->quantity = 0;
+        // order->isActive = false;
 
-        if (printLogs) {
-            lock.lock();
-            std::cout << getTime() << ": " << orderId << " CANCEL" << std::endl;
-            //std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            lock.unlock();
-        }
-        return order->id;
+        // if (printLogs) {
+        //     lock.lock();
+        //     std::cout << getTime() << ": " << orderId << " CANCEL" << std::endl;
+        //     lock.unlock();
+        // }
+        // return order->id;
     }
 
     void LimitOrderBook::destroy() {

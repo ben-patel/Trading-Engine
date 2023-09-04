@@ -3,7 +3,6 @@
 #include <chrono>
 #include <future>
 #include "exchange.hpp"
-#define PRINT_LOGS true // NOTE TAKES 5-10x LONGER WHEN ENABLED
 
 namespace TradingEngine::Exchange {
     Instrument::Instrument(uint32_t symbolId, std::string_view symbol) {
@@ -32,7 +31,7 @@ namespace TradingEngine::Exchange {
     }
 
     uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity, bool multithreading) {
+        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
         currOrderId.fetch_add(1);
 
         std::shared_ptr<TradingEngine::Order::Order> order = std::make_shared<TradingEngine::Order::Order>(
@@ -47,9 +46,9 @@ namespace TradingEngine::Exchange {
             false
         );
 
-        orderArena[orderId] = order;
-        if (!multithreading) {
-            instruments[symbolId]->orderBook.addOrder(symbolId, currOrderId, userId, type, side, lifetime, price, quantity);
+        orderArena[currOrderId] = order;
+        if (MULTITHREADING) {
+            instruments[symbolId]->orderBook.addOrder(order);
             return currOrderId;
         }
 
@@ -57,8 +56,8 @@ namespace TradingEngine::Exchange {
             instrumentThreads[symbolId]->join();
         }
 
-        instrumentThreads[symbolId] = std::make_unique<std::thread>([this, symbolId, userId, type, side, lifetime, price, quantity]() {
-            instruments[symbolId]->orderBook.addOrder(symbolId, currOrderId, userId, type, side, lifetime, price, quantity);
+        instrumentThreads[symbolId] = std::make_unique<std::thread>([this, symbolId, order]() {
+            instruments[symbolId]->orderBook.addOrder(order);
         });
 
         return currOrderId;

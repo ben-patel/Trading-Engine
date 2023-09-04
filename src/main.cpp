@@ -7,8 +7,6 @@
 #include "orders/orderBook.hpp"
 #include "exchange.hpp"
 
-#define MULTITHREADING_ON false
-
 int main() {
     TradingEngine::Exchange::Exchange& exchange = TradingEngine::Exchange::Exchange::getInstance();
     const char* mostTradedStocks[] = {
@@ -47,7 +45,7 @@ int main() {
 
         TradingEngine::Order::OrderSide side = (v1 % 2) ? TradingEngine::Order::OrderSide::BUY : TradingEngine::Order::OrderSide::SELL;
         auto start = std::chrono::high_resolution_clock::now();
-        uint64_t id = exchange.sendOrder(ii, 0, TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2, MULTITHREADING_ON);
+        uint64_t id = exchange.sendOrder(ii, 0, TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2);
         if (v1 > 400) {
             //exchange.cancelOrder(ii, id, 0);
         }

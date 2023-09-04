@@ -14,7 +14,6 @@ namespace TradingEngine::LimitOrderBook {
     constexpr int8_t MIN_PRICE { -1 };
     constexpr uint64_t INVALID_ORDER_ID { 1000002 };
     constexpr uint8_t EMPTY { 0 };
-    constexpr size_t MAX_NUM_ORDERS { 1000001 };
 
     /* Order book entry */
     typedef struct BookEntry {
@@ -41,18 +40,13 @@ namespace TradingEngine::LimitOrderBook {
         /* Allocates memory for book */
         LimitOrderBook(uint32_t symbolId, bool printLogs);
 
-        /* Add order with given info to book */
-        void addOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
+        /* Add order to book */
+        void addOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
 
         void executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price);
 
         /* Inserts given order into the appropriate price point list */
         void insertOrder(std::shared_ptr<PricePoint>& pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order);
-
-        /* Inserts limit order to book */
-        void processLimit(uint32_t symbolId, uint64_t orderId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-            TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
 
         /* Free book memory */
         void destroy();
@@ -73,6 +67,7 @@ namespace TradingEngine::LimitOrderBook {
         void updateMaxBuy();
         void processLimitBuy(const std::shared_ptr<TradingEngine::Order::Order>& order);
         void processLimitSell(const std::shared_ptr<TradingEngine::Order::Order>& order);
+        void processLimit(const std::shared_ptr<TradingEngine::Order::Order>& order);
     };
 
 }
