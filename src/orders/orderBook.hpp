@@ -52,7 +52,7 @@ namespace TradingEngine::LimitOrderBook {
         void destroy();
 
         /* Cancel order with given id, returns order id */
-        uint64_t cancelOrder(uint64_t userId, uint64_t orderId);
+        uint64_t cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
 
     private:
         std::vector<std::shared_ptr<PricePoint>> pricePoints;

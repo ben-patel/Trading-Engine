@@ -27,7 +27,12 @@ namespace TradingEngine::Exchange {
             instrumentThreads[symbolId]->join();
         }
 
-        instruments[symbolId]->orderBook.cancelOrder(userId, orderId);
+        const std::shared_ptr<TradingEngine::Order::Order>& order = orderArena[orderId];
+        if (order->userId != userId) {
+            throw std::runtime_error("CANNOT CANCEL ORDER WITH DIFFERENT USER ID");
+        }
+
+        instruments[symbolId]->orderBook.cancelOrder(order);
     }
 
     uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,

@@ -47,7 +47,7 @@ int main() {
         auto start = std::chrono::high_resolution_clock::now();
         uint64_t id = exchange.sendOrder(ii, 0, TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2);
         if (v1 > 400) {
-            //exchange.cancelOrder(ii, id, 0);
+            exchange.cancelOrder(ii, id, 0);
         }
 
         auto end = std::chrono::high_resolution_clock::now();

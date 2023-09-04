@@ -190,28 +190,22 @@ namespace TradingEngine::LimitOrderBook {
 
     }
 
-    uint64_t LimitOrderBook::cancelOrder(uint64_t userId, uint64_t orderId) {
-        // std::shared_ptr<TradingEngine::Order::Order> order = orderArena[orderId];
+    uint64_t LimitOrderBook::cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order) {
+        if (order->side == TradingEngine::Order::OrderSide::BUY && order->isActive) {
+            bidPrices.erase(bidPrices.find(order->price));
+        } else if (order->isActive) {
+            askPrices.erase(askPrices.find(order->price));
+        }
 
-        // if (order->userId != userId) {
-        //      return INVALID_ORDER_ID;
-        // }
+        order->quantity = 0;
+        order->isActive = false;
 
-        // if (order->side == TradingEngine::Order::OrderSide::BUY && order->isActive) {
-        //     bidPrices.erase(bidPrices.find(order->price));
-        // } else if (order->isActive) {
-        //     askPrices.erase(askPrices.find(order->price));
-        // }
-
-        // order->quantity = 0;
-        // order->isActive = false;
-
-        // if (printLogs) {
-        //     lock.lock();
-        //     std::cout << getTime() << ": " << orderId << " CANCEL" << std::endl;
-        //     lock.unlock();
-        // }
-        // return order->id;
+        if (printLogs) {
+            lock.lock();
+            std::cout << getTime() << ": " << order->id << " CANCEL" << std::endl;
+            lock.unlock();
+        }
+        return order->id;
     }
 
     void LimitOrderBook::destroy() {
