@@ -25,6 +25,10 @@ namespace TradingEngine::Exchange {
     }
 
     uint32_t Exchange::addTrader(const std::string_view& institution, int32_t balance) {
+        if (institution == "") {
+            throw std::runtime_error("ADD TRADER: Institution cannot be empty string");
+        }
+
         currTraderId.fetch_add(1);
         traderArena[currTraderId] = std::make_unique<TradingEngine::Trade::Trader>(currTraderId, institution, balance);
         return currTraderId;
@@ -32,6 +36,10 @@ namespace TradingEngine::Exchange {
 
     uint32_t Exchange::modifyOrder(uint16_t symbolId, uint32_t orderId, uint32_t traderId, const TradingEngine::Order::OrderType& type, const TradingEngine::Order::OrderSide& side,
         const TradingEngine::Order::OrderLifetime& lifetime, int32_t price, uint32_t quantity) {
+        if (symbolId < 0 || price < 0 || quantity == 0 || type != TradingEngine::Order::OrderType::LIMIT || instruments[symbolId] == nullptr || orderArena[orderId] == nullptr) {
+            throw std::runtime_error("MODIFY ORDER: Invalid input");
+        }
+
         cancelOrder(symbolId, orderId);
 
         if (PRINT_LOGS) {
@@ -41,7 +49,7 @@ namespace TradingEngine::Exchange {
     }
 
     void Exchange::cancelOrder(uint16_t symbolId, uint32_t orderId) {
-        if (orderId < 0 || symbolId < 0) {
+        if (orderId < 0 || symbolId < 0 || instruments[symbolId] == nullptr || orderArena[orderId] == nullptr) {
             throw std::runtime_error("CANCEL ORDER: Invalid order id");
         }
 
@@ -61,6 +69,11 @@ namespace TradingEngine::Exchange {
 
     uint32_t Exchange::sendOrder(uint16_t symbolId, uint32_t traderId, const TradingEngine::Order::OrderType& type, const TradingEngine::Order::OrderSide& side,
         const TradingEngine::Order::OrderLifetime& lifetime, int32_t price, uint32_t quantity) {
+        if (symbolId < 0 || instruments[symbolId] == nullptr || traderArena[traderId] == nullptr || price < 0 || quantity == 0 ||
+            traderArena[traderId] == nullptr || type != TradingEngine::Order::OrderType::LIMIT) {
+            throw std::runtime_error("SEND ORDER: Invalid input");
+        }
+
         currOrderId.fetch_add(1);
         std::shared_ptr<TradingEngine::Trade::Trader> trader = traderArena[traderId];
 
@@ -100,6 +113,10 @@ namespace TradingEngine::Exchange {
     }
 
     void Exchange::printTrades(uint32_t traderId) {
+        if (traderId < 0 || traderArena[traderId] == nullptr) {
+            throw std::runtime_error("PRINT TRADES: Invalid trader id");
+        }
+
         traderArena[traderId]->printTrades();
     }
 }

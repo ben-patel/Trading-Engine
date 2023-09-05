@@ -24,15 +24,11 @@ namespace TradingEngine::LimitOrderBook {
         if (order->type == TradingEngine::Order::OrderType::LIMIT) {
             processLimit(order);
         } else {
-            throw std::runtime_error("ERROR: Only accepting limit orders right now.");
+            std::cerr << "ERROR: Only accepting limit orders right now." << std::endl;
         }
     }
 
     void LimitOrderBook::executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint32_t quantity, int32_t price) {
-        if (order1->side == order2->side) {
-            throw std::runtime_error("ERROR: TRADE ORDERS HAVE SAME SIDE");
-        }
-
         uint32_t buyer = (order1->side == TradingEngine::Order::OrderSide::BUY) ? order1->id : order2->id;
         uint32_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
         TradingEngine::Util::ExchangeTime tradeTime;
@@ -48,10 +44,6 @@ namespace TradingEngine::LimitOrderBook {
         order2->trader->makeTrade((order2->id == buyer), order1->id, quantity, price, order2->symbolId, tradeTime);
         order1->quantity -= quantity;
         order2->quantity -= quantity;
-
-        if (order1->quantity < 0 || order2->quantity < 0) {
-            throw std::runtime_error("ERROR: NEGATIVE QUANTITY REMAINING");
-        }
 
         if (order1->quantity == EMPTY) {
             order1->isActive = false;
