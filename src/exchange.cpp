@@ -5,11 +5,9 @@
 #include "exchange.hpp"
 
 namespace TradingEngine::Exchange {
-    Instrument::Instrument(uint32_t symbolId, std::string_view symbol) {
-        this->symbolId = symbolId;
-        this->symbol = symbol;
+    Instrument::Instrument(uint32_t symbolId, std::string_view symbol): symbolId { symbolId }, symbol { symbol } {
         TradingEngine::LimitOrderBook::LimitOrderBook book {symbolId, PRINT_LOGS};
-        this->orderBook = book;
+        orderBook = book;
     }
 
     Exchange& Exchange::getInstance() {
@@ -22,27 +20,30 @@ namespace TradingEngine::Exchange {
         return currSymbolId++;
     }
 
-    void Exchange::cancelOrder(uint32_t symbolId, uint64_t orderId, uint64_t userId) {
+    uint32_t Exchange::addTrader(std::string_view institution, int32_t balance) {
+        currTraderId.fetch_add(1);
+        traderArena[currTraderId] = std::make_unique<TradingEngine::Trade::Trader>(currTraderId, institution, balance);
+        return currTraderId;
+    }
+
+    void Exchange::cancelOrder(uint32_t symbolId, uint64_t orderId) {
         if (instrumentThreads[symbolId] && instrumentThreads[symbolId]->joinable()) {
             instrumentThreads[symbolId]->join();
         }
 
         const std::shared_ptr<TradingEngine::Order::Order>& order = orderArena[orderId];
-        if (order->userId != userId) {
-            throw std::runtime_error("CANNOT CANCEL ORDER WITH DIFFERENT USER ID");
-        }
-
         instruments[symbolId]->orderBook.cancelOrder(order);
     }
 
-    uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t userId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+    uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
         currOrderId.fetch_add(1);
+        std::shared_ptr<TradingEngine::Trade::Trader> trader = traderArena[traderId];
 
         std::shared_ptr<TradingEngine::Order::Order> order = std::make_shared<TradingEngine::Order::Order>(
             currOrderId,
             symbolId,
-            userId,
+            trader,
             type,
             side,
             lifetime,
@@ -52,7 +53,7 @@ namespace TradingEngine::Exchange {
         );
 
         orderArena[currOrderId] = order;
-        if (MULTITHREADING) {
+        if (!MULTITHREADING) {
             instruments[symbolId]->orderBook.addOrder(order);
             return currOrderId;
         }
@@ -72,5 +73,9 @@ namespace TradingEngine::Exchange {
         for (size_t i = 0; i < MAX_NUM_INSTRUMENTS; i++) {
             if (instrumentThreads[i] && instrumentThreads[i]->joinable()) instrumentThreads[i]->join();
         }
+    }
+
+    void Exchange::pr() {
+        traderArena[currTraderId - 1]->printTrades();
     }
 }

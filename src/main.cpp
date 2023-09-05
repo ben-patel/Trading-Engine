@@ -36,18 +36,24 @@ int main() {
         exchange.addInstrument(mostTradedStocks[i%20]);
     }
 
+    uint64_t a = exchange.addTrader("ben", 1000000);
+    uint64_t b = exchange.addTrader("joe", -100000);
+    uint64_t c = exchange.addTrader("deez", -100000);
+    uint64_t d = exchange.addTrader("bob", -10000000);
+    uint64_t traders[] = {a,b,c,d};
     float time = 0.0;
-    for (size_t i = 0; i < 100; i++) {
-        int ii = rand()%100;
-        int j = rand()%100;
-        int v1 = rand()%500 + 1;
-        int v2 = rand()%500 + 1;
+    for (size_t i = 0; i < 200; i++) {
+        uint32_t ii = (uint32_t)rand()%100;
+        uint32_t j = (uint32_t)rand()%100;
+        int64_t v1 = (int64_t)rand()%500 + 1;
+        uint32_t v2 = (uint32_t)rand()%500 + 1;
 
         TradingEngine::Order::OrderSide side = (v1 % 2) ? TradingEngine::Order::OrderSide::BUY : TradingEngine::Order::OrderSide::SELL;
         auto start = std::chrono::high_resolution_clock::now();
-        uint64_t id = exchange.sendOrder(ii, 0, TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2);
-        if (v1 > 400) {
-            exchange.cancelOrder(ii, id, 0);
+        size_t trader = rand()%4;
+        uint64_t id = exchange.sendOrder(ii, traders[trader], TradingEngine::Order::OrderType::LIMIT, side, TradingEngine::Order::OrderLifetime::GTC, v1, v2);
+        if (v1 > 450) {
+            exchange.cancelOrder(ii, id);
         }
 
         auto end = std::chrono::high_resolution_clock::now();
@@ -55,6 +61,7 @@ int main() {
         time += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
+    exchange.pr();
     exchange.destroy();
     std::cout << time / 1000000 << std::endl;
     return 0;

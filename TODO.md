@@ -1,5 +1,4 @@
-- fix single responsibility, really think about what should do what
-- execute trade
+- modify orders + cancel logs
 - refactor orderArena + add traderArena
 - add traders
 - error + edge case handling

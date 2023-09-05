@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 #include "orderBook.hpp"
-#include "order.hpp"
 
 namespace TradingEngine::LimitOrderBook {
     std::mutex lock;
@@ -14,15 +13,8 @@ namespace TradingEngine::LimitOrderBook {
         listEnd = nullptr;
     }
 
-    LimitOrderBook::LimitOrderBook(uint32_t symbolId, bool printLogs) {
-        minAsk = MAX_PRICE;
-        maxBid = -1;
-        pricePoints = std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE);
-        bidPrices = std::multiset<int64_t>();
-        askPrices = std::multiset<int64_t>();
-        this->printLogs = printLogs;
-        this->symbolId = symbolId;
-
+    LimitOrderBook::LimitOrderBook(uint32_t symbolId, bool printLogs): printLogs { printLogs }, symbolId { symbolId }, minAsk { MAX_PRICE }, maxBid { -1 },
+        pricePoints { std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE) }, bidPrices { std::multiset<int64_t>() }, askPrices { std::multiset<int64_t>() } {
         for (size_t i = 0; i < MAX_PRICE; i++) {
             pricePoints[i] = std::make_shared<PricePoint>();
         }
@@ -36,38 +28,24 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    std::string getTime() {
-        auto now = std::chrono::system_clock::now();
-        auto now_c = std::chrono::system_clock::to_time_t(now);
-        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-        auto micros = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()) % 1000000;
-
-        struct tm timeinfo;
-        localtime_r(&now_c, &timeinfo);
-
-        std::ostringstream oss;
-        oss << std::put_time(&timeinfo, "%H:%M:%S")
-            << ":" << std::setw(3) << std::setfill('0') << millis.count()
-            << ":" << std::setw(6) << std::setfill('0') << micros.count();
-        return oss.str();
-    }
-
     void LimitOrderBook::executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price) {
-        uint64_t buyer = (order1->side == TradingEngine::Order::OrderSide::BUY) ? order1->id : order2->id;
-        uint64_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
-
-        if (printLogs) {
-            lock.lock();
-            std::cout << getTime() << ": " << order1->symbolId << " TRADE " << quantity << " @ " << price << std::endl;
-            //std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            std::cout << std::flush;
-            lock.unlock();
-        }
-
         if (order1->side == order2->side) {
             throw std::runtime_error("ERROR: TRADE ORDERS HAVE SAME SIDE");
         }
 
+        uint64_t buyer = (order1->side == TradingEngine::Order::OrderSide::BUY) ? order1->id : order2->id;
+        uint64_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
+        TradingEngine::Util::ExchangeTime tradeTime;
+
+        if (printLogs) {
+            lock.lock();
+            std::cout << tradeTime.getString() << ": " << order1->symbolId << " TRADE " << quantity << " @ " << price << " [" << order1->trader->getInstitution() << ", " << order2->trader->getInstitution() << "]" << std::endl;
+            std::cout << std::flush;
+            lock.unlock();
+        }
+
+        order1->trader->makeTrade((order1->id == buyer), order2->id, quantity, price, order1->symbolId, tradeTime);
+        order2->trader->makeTrade((order2->id == buyer), order1->id, quantity, price, order2->symbolId, tradeTime);
         order1->quantity -= quantity;
         order2->quantity -= quantity;
 
@@ -202,7 +180,8 @@ namespace TradingEngine::LimitOrderBook {
 
         if (printLogs) {
             lock.lock();
-            std::cout << getTime() << ": " << order->id << " CANCEL" << std::endl;
+            TradingEngine::Util::ExchangeTime cancelTime;
+            std::cout << cancelTime.getString() << ": " << order->id << " CANCEL" << std::endl;
             lock.unlock();
         }
         return order->id;
