@@ -12,7 +12,7 @@ namespace TradingEngine::Trade {
         TradingEngine::Util::ExchangeTime tradeTime
     ): buyTraderId { buyTraderId }, sellTraderId { sellTraderId }, quantity { quantity }, price { price }, symbolId { symbolId }, tradeTime { tradeTime } {}
 
-    Trader::Trader(uint64_t id, std::string_view institution, int32_t balance): id { id }, institution { institution }, balance { balance } {}
+    Trader::Trader(uint64_t id, std::string_view institution, int32_t balance): id { id }, institution { institution }, balance { balance }, startingBalance { balance } {}
 
     void Trader::makeTrade(bool buy, uint64_t otherId, uint64_t quantity, int64_t price, uint64_t symbolId, TradingEngine::Util::ExchangeTime tradeTime) {
         uint64_t cost = (uint64_t)price * quantity;
@@ -34,6 +34,9 @@ namespace TradingEngine::Trade {
             std::cout << "Symbol: " << trade.symbolId << "\n";
             std::cout << std::endl;
         }
+
+        int32_t profit = balance - startingBalance;
+        std::cout << "Ending Balance: " << balance << " (" << ((profit >= 0) ? "+" : "" ) << profit << ")" << std::endl;
     }
 
     std::string_view Trader::getInstitution() {

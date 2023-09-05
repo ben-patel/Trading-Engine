@@ -1,6 +1,3 @@
-- modify orders + cancel logs
-- refactor orderArena + add traderArena
-- add traders
 - error + edge case handling
 - const stuff
 - make struct defs consistent

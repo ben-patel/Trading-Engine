@@ -26,6 +26,16 @@ namespace TradingEngine::Exchange {
         return currTraderId;
     }
 
+    uint64_t Exchange::modifyOrder(uint32_t symbolId, uint64_t orderId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
+        cancelOrder(symbolId, orderId);
+
+        if (PRINT_LOGS) {
+            std::cout << TradingEngine::Util::ExchangeTime().getString() << ": " << orderId << " MODIFY ORDER" << std::endl;
+        }
+        return sendOrder(symbolId, traderId, type, side, lifetime, price, quantity);
+    }
+
     void Exchange::cancelOrder(uint32_t symbolId, uint64_t orderId) {
         if (instrumentThreads[symbolId] && instrumentThreads[symbolId]->joinable()) {
             instrumentThreads[symbolId]->join();
@@ -75,7 +85,7 @@ namespace TradingEngine::Exchange {
         }
     }
 
-    void Exchange::pr() {
-        traderArena[currTraderId - 1]->printTrades();
+    void Exchange::printTrades(uint64_t traderId) {
+        traderArena[traderId]->printTrades();
     }
 }

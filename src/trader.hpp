@@ -39,6 +39,7 @@ namespace TradingEngine::Trade {
     private:
         uint64_t id;
         int32_t balance;
+        int32_t startingBalance;
         std::vector<TradeResponse> trades;
         std::string_view institution;
     };

@@ -38,13 +38,17 @@ namespace TradingEngine::Exchange {
         uint64_t sendOrder(uint32_t symbolId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
         TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
 
+        /* Modify given order, note: loses time priority after modification */
+        uint64_t modifyOrder(uint32_t symbolId, uint64_t orderId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
+        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity);
+
         /* Cancels given order */
         void cancelOrder(uint32_t symbolId, uint64_t orderId);
 
         /* Free exchange memory after usage */
         void destroy();
 
-        void pr();
+        void printTrades(uint64_t traderId);
 
     private:
         Exchange() : currSymbolId { 0 }, currOrderId { 0 }, currTraderId { 0 } {}
