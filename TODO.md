@@ -1,5 +1,3 @@
-- error + edge case handling
-- fix namespaces
 - Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
 - more order types
 - server

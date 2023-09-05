@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include "util.hpp"
+#include "misc/util.hpp"
 
 namespace TradingEngine::Trade {
     struct TradeResponse {
@@ -10,7 +10,7 @@ namespace TradingEngine::Trade {
         uint32_t sellTraderId;
         uint32_t quantity;
         int32_t price;
-        uint16_t symbolId;
+        std::string_view symbol;
         TradingEngine::Util::ExchangeTime tradeTime;
 
         TradeResponse() = default;
@@ -19,7 +19,7 @@ namespace TradingEngine::Trade {
             uint32_t sellTraderId,
             uint32_t quantity,
             int32_t price,
-            uint16_t symbolId,
+            const std::string_view& symbol,
             const TradingEngine::Util::ExchangeTime& tradeTime
         );
     };
@@ -29,7 +29,7 @@ namespace TradingEngine::Trade {
         Trader(uint32_t userId, const std::string_view& institution, int32_t balance);
 
         /* Update balance after trader makes a trade */
-        void makeTrade(bool buy, uint32_t otherId, uint32_t quantity, int32_t price, uint16_t symbolId, const TradingEngine::Util::ExchangeTime& tradeTime);
+        void makeTrade(bool buy, uint32_t otherId, uint32_t quantity, int32_t price, const std::string_view& symbol, const TradingEngine::Util::ExchangeTime& tradeTime);
 
         /* Getter */
         std::string_view getInstitution();

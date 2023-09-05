@@ -8,13 +8,13 @@ namespace TradingEngine::Trade {
         uint32_t sellTraderId,
         uint32_t quantity,
         int32_t price,
-        uint16_t symbolId,
+        const std::string_view& symbol,
         const TradingEngine::Util::ExchangeTime& tradeTime
-    ): buyTraderId { buyTraderId }, sellTraderId { sellTraderId }, quantity { quantity }, price { price }, symbolId { symbolId }, tradeTime { tradeTime } {}
+    ): buyTraderId { buyTraderId }, sellTraderId { sellTraderId }, quantity { quantity }, price { price }, symbol { symbol }, tradeTime { tradeTime } {}
 
     Trader::Trader(uint32_t id, const std::string_view& institution, int32_t balance): id { id }, institution { institution }, balance { balance }, startingBalance { balance } {}
 
-    void Trader::makeTrade(bool buy, uint32_t otherId, uint32_t quantity, int32_t price, uint16_t symbolId, const TradingEngine::Util::ExchangeTime& tradeTime) {
+    void Trader::makeTrade(bool buy, uint32_t otherId, uint32_t quantity, int32_t price, const std::string_view& symbolId, const TradingEngine::Util::ExchangeTime& tradeTime) {
         uint32_t cost = (uint32_t)price * quantity;
         balance -= (buy ? cost : -cost);
 
@@ -28,10 +28,9 @@ namespace TradingEngine::Trade {
         std::cout << std::endl;
         for (TradeResponse trade : trades) {
             std::cout << "Trade at " << trade.tradeTime.getString() << ":\n";
-            std::cout << ((trade.buyTraderId == id) ? "Buy" : "Sell") << "\n";
+            std::cout << ((trade.buyTraderId == id) ? "Buy " : "Sell ") << trade.symbol << "\n";
             std::cout << "Quantity: " << trade.quantity << "\n";
             std::cout << "Price: " << trade.price << "\n";
-            std::cout << "Symbol: " << trade.symbolId << "\n";
             std::cout << std::endl;
         }
 

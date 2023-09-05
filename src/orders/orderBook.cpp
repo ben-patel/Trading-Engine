@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <sstream>
 #include "orderBook.hpp"
+#define MAX_NUM_INSTRUMENTS 2500
+std::string symbols[MAX_NUM_INSTRUMENTS];
 
 namespace TradingEngine::LimitOrderBook {
     std::mutex lock;
@@ -35,13 +37,13 @@ namespace TradingEngine::LimitOrderBook {
 
         if (printLogs) {
             lock.lock();
-            std::cout << tradeTime.getString() << ": " << order1->symbolId << " TRADE " << quantity << " @ " << price << " [" << order1->trader->getInstitution() << ", " << order2->trader->getInstitution() << "]" << std::endl;
+            std::cout << tradeTime.getString() << ": [" << symbols[order1->symbolId] << "] TRADE " << quantity << " @ " << price << std::endl; //<< " [" << order1->trader->getInstitution() << ", " << order2->trader->getInstitution() << "]" << std::endl;
             std::cout << std::flush;
             lock.unlock();
         }
 
-        order1->trader->makeTrade((order1->id == buyer), order2->id, quantity, price, order1->symbolId, tradeTime);
-        order2->trader->makeTrade((order2->id == buyer), order1->id, quantity, price, order2->symbolId, tradeTime);
+        order1->trader->makeTrade((order1->id == buyer), order2->id, quantity, price, symbols[order1->symbolId], tradeTime);
+        order2->trader->makeTrade((order2->id == buyer), order1->id, quantity, price, symbols[order2->symbolId], tradeTime);
         order1->quantity -= quantity;
         order2->quantity -= quantity;
 

@@ -4,8 +4,10 @@
 #include <future>
 #include "exchange.hpp"
 
+extern std::string symbols[];
+
 namespace TradingEngine::Exchange {
-    Instrument::Instrument(uint16_t symbolId, const std::string_view& symbol): symbolId { symbolId }, symbol { symbol } {
+    Instrument::Instrument(uint16_t symbolId, const std::string_view& symbol ): symbolId { symbolId }, symbol { symbol } {
         TradingEngine::LimitOrderBook::LimitOrderBook book {symbolId, PRINT_LOGS};
         orderBook = book;
     }
@@ -15,11 +17,12 @@ namespace TradingEngine::Exchange {
         return instance;
     }
 
-    uint32_t Exchange::addInstrument(const std::string_view& symbol) {
+    uint32_t Exchange::addInstrument(const std::string& symbol) {
         if (symbol == "") {
             throw std::runtime_error("ADD INSTRUMENT: Invalid symbol");
         }
 
+        symbols[currSymbolId] = symbol;
         instruments[currSymbolId] = std::make_unique<Instrument>(currSymbolId, symbol);
         return currSymbolId++;
     }
@@ -77,6 +80,7 @@ namespace TradingEngine::Exchange {
         currOrderId.fetch_add(1);
         std::shared_ptr<TradingEngine::Trade::Trader> trader = traderArena[traderId];
 
+        std::string_view symbol = instruments[symbolId]->symbol;
         std::shared_ptr<TradingEngine::Order::Order> order = std::make_shared<TradingEngine::Order::Order>(
             currOrderId,
             symbolId,

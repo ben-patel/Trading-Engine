@@ -7,17 +7,17 @@
 #include "trader.hpp"
 
 /* Takes 5-10x longer when either are enabled */
-#define PRINT_LOGS true
+#define PRINT_LOGS false
 #define MULTITHREADING false
 
 namespace TradingEngine::Exchange {
     constexpr size_t MAX_NUM_INSTRUMENTS { 2500 };
-    constexpr size_t MAX_NUM_ORDERS { 1000001 };
-    constexpr size_t MAX_NUM_TRADERS { 100000 };
+    constexpr size_t MAX_NUM_ORDERS { 100001 }; // 100k
+    constexpr size_t MAX_NUM_TRADERS { 10000 };
 
     typedef struct Instrument {
         uint16_t symbolId;
-        const std::string_view symbol;
+        std::string_view symbol;
         TradingEngine::LimitOrderBook::LimitOrderBook orderBook;
 
         Instrument(uint16_t symbolId, const std::string_view& symbol);
@@ -29,7 +29,7 @@ namespace TradingEngine::Exchange {
         static Exchange& getInstance();
 
         /* Adds a new book to exchange with new symbol */
-        uint32_t addInstrument(const std::string_view& symbol);
+        uint32_t addInstrument(const std::string& symbol);
 
         /* Adds a new trader to this exchange */
         uint32_t addTrader(const std::string_view& institution, int32_t balance);
