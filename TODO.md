@@ -1,11 +1,7 @@
 - error + edge case handling
-- const stuff
-- make struct defs consistent
-- fix int sizes + return values etc.
-- modify order
 - fix namespaces
 - Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
 - more order types
-- db
 - server
-- reporter
+- db
+- optimise everything

@@ -13,8 +13,8 @@ namespace TradingEngine::LimitOrderBook {
         listEnd = nullptr;
     }
 
-    LimitOrderBook::LimitOrderBook(uint32_t symbolId, bool printLogs): printLogs { printLogs }, symbolId { symbolId }, minAsk { MAX_PRICE }, maxBid { -1 },
-        pricePoints { std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE) }, bidPrices { std::multiset<int64_t>() }, askPrices { std::multiset<int64_t>() } {
+    LimitOrderBook::LimitOrderBook(uint16_t symbolId, bool printLogs): printLogs { printLogs }, symbolId { symbolId }, minAsk { MAX_PRICE }, maxBid { -1 },
+        pricePoints { std::vector<std::shared_ptr<PricePoint>>(MAX_PRICE) }, bidPrices { std::multiset<int32_t>() }, askPrices { std::multiset<int32_t>() } {
         for (size_t i = 0; i < MAX_PRICE; i++) {
             pricePoints[i] = std::make_shared<PricePoint>();
         }
@@ -28,13 +28,13 @@ namespace TradingEngine::LimitOrderBook {
         }
     }
 
-    void LimitOrderBook::executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price) {
+    void LimitOrderBook::executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint32_t quantity, int32_t price) {
         if (order1->side == order2->side) {
             throw std::runtime_error("ERROR: TRADE ORDERS HAVE SAME SIDE");
         }
 
-        uint64_t buyer = (order1->side == TradingEngine::Order::OrderSide::BUY) ? order1->id : order2->id;
-        uint64_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
+        uint32_t buyer = (order1->side == TradingEngine::Order::OrderSide::BUY) ? order1->id : order2->id;
+        uint32_t seller = (order1->side == TradingEngine::Order::OrderSide::SELL) ? order1->id : order2->id;
         TradingEngine::Util::ExchangeTime tradeTime;
 
         if (printLogs) {
@@ -168,7 +168,7 @@ namespace TradingEngine::LimitOrderBook {
 
     }
 
-    uint64_t LimitOrderBook::cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order) {
+    uint32_t LimitOrderBook::cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order) {
         if (order->side == TradingEngine::Order::OrderSide::BUY && order->isActive) {
             bidPrices.erase(bidPrices.find(order->price));
         } else if (order->isActive) {

@@ -4,15 +4,15 @@ namespace TradingEngine::Util {
     ExchangeTime::ExchangeTime() {
         std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         struct std::tm* timeInfo = std::localtime(&currentTime);
-        uint64_t h = (uint64_t)timeInfo->tm_hour;
-        uint64_t m = (uint64_t)timeInfo->tm_min;
-        uint64_t s = (uint64_t)timeInfo->tm_sec;
+        unsigned int h = (unsigned int)timeInfo->tm_hour;
+        unsigned int m = (unsigned int)timeInfo->tm_min;
+        unsigned int s = (unsigned int)timeInfo->tm_sec;
 
-        uint64_t ms = (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(
+        unsigned int ms = (unsigned int)std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now().time_since_epoch())
         .count() % 1000;
 
-        uint64_t us = (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(
+        unsigned int us = (unsigned int)std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::high_resolution_clock::now().time_since_epoch())
         .count() % 1000000;
 

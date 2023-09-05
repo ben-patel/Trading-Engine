@@ -6,30 +6,30 @@
 
 namespace TradingEngine::Trade {
     struct TradeResponse {
-        uint64_t buyTraderId;
-        uint64_t sellTraderId;
-        uint64_t quantity;
-        int64_t price;
-        uint64_t symbolId;
+        uint32_t buyTraderId;
+        uint32_t sellTraderId;
+        uint32_t quantity;
+        int32_t price;
+        uint16_t symbolId;
         TradingEngine::Util::ExchangeTime tradeTime;
 
         TradeResponse() = default;
         TradeResponse(
-            uint64_t buyTraderId,
-            uint64_t sellTraderId,
-            uint64_t quantity,
-            int64_t price,
-            uint64_t symbolId,
-            TradingEngine::Util::ExchangeTime tradeTime
+            uint32_t buyTraderId,
+            uint32_t sellTraderId,
+            uint32_t quantity,
+            int32_t price,
+            uint16_t symbolId,
+            const TradingEngine::Util::ExchangeTime& tradeTime
         );
     };
 
     class Trader {
     public:
-        Trader(uint64_t userId, std::string_view institution, int32_t balance);
+        Trader(uint32_t userId, const std::string_view& institution, int32_t balance);
 
         /* Update balance after trader makes a trade */
-        void makeTrade(bool buy, uint64_t otherId, uint64_t quantity, int64_t price, uint64_t symbolId, TradingEngine::Util::ExchangeTime tradeTime);
+        void makeTrade(bool buy, uint32_t otherId, uint32_t quantity, int32_t price, uint16_t symbolId, const TradingEngine::Util::ExchangeTime& tradeTime);
 
         /* Getter */
         std::string_view getInstitution();
@@ -37,7 +37,7 @@ namespace TradingEngine::Trade {
         /* Prints trade history */
         void printTrades();
     private:
-        uint64_t id;
+        uint32_t id;
         int32_t balance;
         int32_t startingBalance;
         std::vector<TradeResponse> trades;

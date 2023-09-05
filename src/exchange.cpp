@@ -5,7 +5,7 @@
 #include "exchange.hpp"
 
 namespace TradingEngine::Exchange {
-    Instrument::Instrument(uint32_t symbolId, std::string_view symbol): symbolId { symbolId }, symbol { symbol } {
+    Instrument::Instrument(uint16_t symbolId, const std::string_view& symbol): symbolId { symbolId }, symbol { symbol } {
         TradingEngine::LimitOrderBook::LimitOrderBook book {symbolId, PRINT_LOGS};
         orderBook = book;
     }
@@ -15,19 +15,23 @@ namespace TradingEngine::Exchange {
         return instance;
     }
 
-    uint32_t Exchange::addInstrument(std::string_view symbol) {
+    uint32_t Exchange::addInstrument(const std::string_view& symbol) {
+        if (symbol == "") {
+            throw std::runtime_error("ADD INSTRUMENT: Invalid symbol");
+        }
+
         instruments[currSymbolId] = std::make_unique<Instrument>(currSymbolId, symbol);
         return currSymbolId++;
     }
 
-    uint32_t Exchange::addTrader(std::string_view institution, int32_t balance) {
+    uint32_t Exchange::addTrader(const std::string_view& institution, int32_t balance) {
         currTraderId.fetch_add(1);
         traderArena[currTraderId] = std::make_unique<TradingEngine::Trade::Trader>(currTraderId, institution, balance);
         return currTraderId;
     }
 
-    uint64_t Exchange::modifyOrder(uint32_t symbolId, uint64_t orderId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
+    uint32_t Exchange::modifyOrder(uint16_t symbolId, uint32_t orderId, uint32_t traderId, const TradingEngine::Order::OrderType& type, const TradingEngine::Order::OrderSide& side,
+        const TradingEngine::Order::OrderLifetime& lifetime, int32_t price, uint32_t quantity) {
         cancelOrder(symbolId, orderId);
 
         if (PRINT_LOGS) {
@@ -36,17 +40,27 @@ namespace TradingEngine::Exchange {
         return sendOrder(symbolId, traderId, type, side, lifetime, price, quantity);
     }
 
-    void Exchange::cancelOrder(uint32_t symbolId, uint64_t orderId) {
+    void Exchange::cancelOrder(uint16_t symbolId, uint32_t orderId) {
+        if (orderId < 0 || symbolId < 0) {
+            throw std::runtime_error("CANCEL ORDER: Invalid order id");
+        }
+
+        const std::shared_ptr<TradingEngine::Order::Order>& order = orderArena[orderId];
+        if (order == nullptr) {
+            throw std::runtime_error("CANCEL ORDER: Invalid order id");
+        } else if (symbolId != order->symbolId || instruments[symbolId] == nullptr) {
+            throw std::runtime_error("CANCEL ORDER: Invalid symbol id");
+        }
+
         if (instrumentThreads[symbolId] && instrumentThreads[symbolId]->joinable()) {
             instrumentThreads[symbolId]->join();
         }
 
-        const std::shared_ptr<TradingEngine::Order::Order>& order = orderArena[orderId];
         instruments[symbolId]->orderBook.cancelOrder(order);
     }
 
-    uint64_t Exchange::sendOrder(uint32_t symbolId, uint64_t traderId, TradingEngine::Order::OrderType type, TradingEngine::Order::OrderSide side,
-        TradingEngine::Order::OrderLifetime lifetime, int64_t price, uint32_t quantity) {
+    uint32_t Exchange::sendOrder(uint16_t symbolId, uint32_t traderId, const TradingEngine::Order::OrderType& type, const TradingEngine::Order::OrderSide& side,
+        const TradingEngine::Order::OrderLifetime& lifetime, int32_t price, uint32_t quantity) {
         currOrderId.fetch_add(1);
         std::shared_ptr<TradingEngine::Trade::Trader> trader = traderArena[traderId];
 
@@ -85,7 +99,7 @@ namespace TradingEngine::Exchange {
         }
     }
 
-    void Exchange::printTrades(uint64_t traderId) {
+    void Exchange::printTrades(uint32_t traderId) {
         traderArena[traderId]->printTrades();
     }
 }

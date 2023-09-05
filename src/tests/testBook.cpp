@@ -13,8 +13,8 @@ protected:
     TradingEngine::Order::OrderType market = TradingEngine::Order::OrderType::MARKET;
     uint32_t symbolId = 0;
     uint32_t userId = 1;
-    uint64_t price = 10;
-    uint64_t quantity = 100;
+    int32_t price = 10;
+    uint32_t quantity = 100;
 };
 
 TEST_F(testBook, TestSuccessMatch) {

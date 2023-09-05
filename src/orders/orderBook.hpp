@@ -10,9 +10,9 @@
 /* Prices are represented as whole integers, but in cents. e.g. 100 = $1.00, 2506 = $25.06 */
 namespace TradingEngine::LimitOrderBook {
     constexpr uint8_t TICKS_PER_UNIT { 100 };
-    constexpr int64_t MAX_PRICE { TICKS_PER_UNIT * 1000 };
+    constexpr int32_t MAX_PRICE { TICKS_PER_UNIT * 1000 };
     constexpr int8_t MIN_PRICE { -1 };
-    constexpr uint64_t INVALID_ORDER_ID { 1000002 };
+    constexpr uint32_t INVALID_ORDER_ID { 1000002 };
     constexpr uint8_t EMPTY { 0 };
 
     /* Order book entry */
@@ -38,12 +38,12 @@ namespace TradingEngine::LimitOrderBook {
     public:
         LimitOrderBook() = default;
         /* Allocates memory for book */
-        LimitOrderBook(uint32_t symbolId, bool printLogs);
+        LimitOrderBook(uint16_t symbolId, bool printLogs);
 
         /* Add order to book */
         void addOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
 
-        void executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint64_t quantity, int64_t price);
+        void executeTrade(const std::shared_ptr<TradingEngine::Order::Order>& order1, const std::shared_ptr<TradingEngine::Order::Order>& order2, uint32_t quantity, int32_t price);
 
         /* Inserts given order into the appropriate price point list */
         void insertOrder(std::shared_ptr<PricePoint>& pricePoint, const std::shared_ptr<TradingEngine::Order::Order>& order);
@@ -52,14 +52,14 @@ namespace TradingEngine::LimitOrderBook {
         void destroy();
 
         /* Cancel order with given id, returns order id */
-        uint64_t cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
+        uint32_t cancelOrder(const std::shared_ptr<TradingEngine::Order::Order>& order);
 
     private:
         std::vector<std::shared_ptr<PricePoint>> pricePoints;
-        std::multiset<int64_t> bidPrices;
-        std::multiset<int64_t> askPrices;
-        int64_t minAsk;
-        int64_t maxBid;
+        std::multiset<int32_t> bidPrices;
+        std::multiset<int32_t> askPrices;
+        int32_t minAsk;
+        int32_t maxBid;
         uint32_t symbolId;
         bool printLogs;
 
