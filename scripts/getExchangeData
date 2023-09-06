@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+import csv
+
+csv_file = '../exchanges/nasdaq.csv'
+
+column_data = []
+
+with open(csv_file, 'r') as file:
+    csv_reader = csv.reader(file)
+    column_number = 0
+
+    for row in csv_reader:
+        if len(row) > column_number:
+            column_data.append(row[column_number])
+
+for item in column_data:
+    if (item != "Symbol"):
+        print(f'{item}')

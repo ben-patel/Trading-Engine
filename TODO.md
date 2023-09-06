@@ -1,4 +1,4 @@
-- Factory for different exchanges (e.g. ASX, NZX, TSE, NIKKEI, BSE, TWSE, HKEX)
+- fix global symbols bullshit
 - more order types
 - server
 - db

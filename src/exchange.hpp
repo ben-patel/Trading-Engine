@@ -7,7 +7,7 @@
 #include "trader.hpp"
 
 /* Takes 5-10x longer when either are enabled */
-#define PRINT_LOGS false
+#define PRINT_LOGS true
 #define MULTITHREADING false
 
 namespace TradingEngine::Exchange {
