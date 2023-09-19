@@ -7,11 +7,20 @@
 #include "orders/orderBook.hpp"
 #include "exchange/exchange.hpp"
 #include "misc/exchangeFactory.hpp"
+#include "server/server.hpp"
 using namespace TradingEngine;
 
 int main() {
     std::cout << "Creating exchange..." << std::endl;
-    TradingEngine::Exchange::Exchange& exchange = *(TradingEngine::Util::ExchangeFactory::getExchange("taiwanIndiaSymbols"));
+    //TradingEngine::Exchange::Exchange& exchange = *(TradingEngine::Util::ExchangeFactory::getExchange("taiwanIndiaSymbols"));
+    TradingEngine::Exchange::Exchange& exchange = TradingEngine::Exchange::Exchange::getInstance();
+    for (int i = 0; i < 100; ++i) {
+        exchange.addInstrument(std::to_string(i));
+    }
+
+    Server server;
+    std::cout << "Starting server..." << std::endl;
+    server.start();
     uint32_t a = (uint32_t)exchange.addTrader("ben", 1000000);
     uint32_t b = (uint32_t)exchange.addTrader("joe", -100000);
     uint32_t c = (uint32_t)exchange.addTrader("deez", -100000);
@@ -45,7 +54,7 @@ int main() {
         time += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
-    exchange.printTrades(a);
+    //exchange.printTrades(a);
     std::cout << "Freeing memory..." << std::endl;
     exchange.destroy();
     std::cout << time / 1000000 << std::endl;
