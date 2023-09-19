@@ -3,7 +3,7 @@
 #include "../orders/order.hpp"
 #include "../orders/orderBook.hpp"
 
-/* Extremely limited unit tests, mostly been doing system tests */
+/* redundant tests, i'm lazy */
 class testBook : public ::testing::Test {
 protected:
     TradingEngine::Order::OrderLifetime lifetimeGTC = TradingEngine::Order::OrderLifetime::GTC;

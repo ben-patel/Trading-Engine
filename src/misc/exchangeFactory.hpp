@@ -1,5 +1,5 @@
 #include <string>
-#include "../exchange.hpp"
+#include "../exchange/exchange.hpp"
 
 namespace TradingEngine::Util {
     class ExchangeFactory {

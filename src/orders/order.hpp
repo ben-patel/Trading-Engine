@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../trader.hpp"
+#include "../exchange/trader.hpp"
 
 namespace TradingEngine::Order {
     enum class OrderType {

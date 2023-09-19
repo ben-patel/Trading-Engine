@@ -5,7 +5,7 @@
 #include <iomanip>
 #include "orders/order.hpp"
 #include "orders/orderBook.hpp"
-#include "exchange.hpp"
+#include "exchange/exchange.hpp"
 #include "misc/exchangeFactory.hpp"
 using namespace TradingEngine;
 
@@ -22,7 +22,6 @@ int main() {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     std::cout << "Finished" << std::endl;
     for (size_t i = 0; i < 100; i++) {
-        std:
         uint16_t ii = (uint16_t)rand()%100;
         uint32_t j = (uint32_t)rand()%100;
         uint32_t v1 = (uint32_t)rand()%500 + 1;
@@ -47,6 +46,7 @@ int main() {
     }
 
     exchange.printTrades(a);
+    std::cout << "Freeing memory..." << std::endl;
     exchange.destroy();
     std::cout << time / 1000000 << std::endl;
     return 0;
