@@ -3,14 +3,18 @@
 #include <chrono>
 #include <time.h>
 #include <iomanip>
+#include <pqxx/pqxx>
 #include "server/server.hpp"
+
 using namespace TradingEngine;
 
 int main() {
+    std::string connString = "hostaddr=127.0.0.1 port=5432 dbname=trading-db";
+    pqxx::connection dbConn(connString);
+    std::cout << "MAIN: Connected to database " << dbConn.dbname() << '\n';
 
     TradingEngine::Server server("smallTest");
     server.start();
-
 
     // uint32_t a = (uint32_t)exchange.addTrader("ben", 1000000);
     // uint32_t b = (uint32_t)exchange.addTrader("joe", -100000);

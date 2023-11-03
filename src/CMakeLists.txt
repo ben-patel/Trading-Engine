@@ -13,5 +13,9 @@ set(CMAKE_CXX_STANDARD 17)
 # run main: ./engine
 add_executable(${PROJECT_NAME} main.cpp exchange/trader.cpp server/server.cpp misc/util.cpp orders/order.cpp orders/orderBook.cpp exchange/exchange.cpp misc/exchangeFactory.cpp)
 find_package(Crow)
-target_link_libraries(${PROJECT_NAME} PUBLIC Crow::Crow)
 target_compile_options(${PROJECT_NAME} PRIVATE -g -Wall)
+
+add_subdirectory(../external/libpqxx build-pqxx)
+target_link_libraries(${PROJECT_NAME} PRIVATE pqxx)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Crow::Crow)
