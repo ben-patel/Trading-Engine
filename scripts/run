@@ -1,0 +1,16 @@
+#!/bin/bash
+
+exit_script() {
+    pg_ctl stop -D "$HOME"/trading-db;
+    trap - SIGINT SIGTERM
+    kill -- -$$
+}
+
+pg_ctl start -D "$HOME"/trading-db;
+
+trap exit_script SIGINT SIGTERM
+../build/engine
+
+
+
+
